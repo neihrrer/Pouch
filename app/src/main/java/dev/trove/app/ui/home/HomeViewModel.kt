@@ -41,6 +41,8 @@ import kotlinx.coroutines.launch
 
 enum class ArticleFilter { ALL, UNREAD, FAVORITES, DONE }
 
+enum class SortOrder { NEWEST, OLDEST, READING_TIME }
+
 sealed interface AddState {
     data object Idle : AddState
     data object Working : AddState
@@ -56,6 +58,7 @@ data class HomeUiState(
     val settingsState: ReaderSettings = ReaderSettings(),
     val tab: Int = 0,
     val filter: ArticleFilter = ArticleFilter.ALL,
+    val sortOrder: SortOrder = SortOrder.NEWEST,
     val searchQuery: String = "",
     val searchActive: Boolean = false,
     val searchResults: List<ArticleWithTags> = emptyList(),
@@ -98,6 +101,7 @@ class HomeViewModel(
 
     private val tab = MutableStateFlow(0)
     private val filter = MutableStateFlow(ArticleFilter.ALL)
+    private val sortOrder = MutableStateFlow(SortOrder.NEWEST)
     private val browsingFolder = MutableStateFlow<Long?>(null)
     private val browsingTag = MutableStateFlow<Long?>(null)
     private val browsingFeed = MutableStateFlow<Long?>(null)
@@ -146,13 +150,24 @@ class HomeViewModel(
         }
     }
 
-    private val filteredArticles = combine(baseArticles, filter) { list, f ->
-        when (f) {
+    private val filteredArticles = combine(baseArticles, filter, sortOrder) { list, f, sort ->
+        val filtered = when (f) {
             ArticleFilter.ALL -> list
             ArticleFilter.UNREAD -> list.filter { !it.article.isRead }
             ArticleFilter.FAVORITES -> list.filter { it.article.isFavorite }
             ArticleFilter.DONE -> list.filter { it.article.isRead }
         }
+        when (sort) {
+            SortOrder.NEWEST -> filtered.sortedByDescending { it.article.addedAt }
+            SortOrder.OLDEST -> filtered.sortedBy { it.article.addedAt }
+            SortOrder.READING_TIME -> filtered.sortedByDescending { readingMinutes(it.article.contentText) }
+        }
+    }
+
+    /** Estimated reading minutes at ~200 wpm. */
+    private fun readingMinutes(contentText: String?): Int {
+        if (contentText.isNullOrBlank()) return 0
+        return (contentText.split(Regex("\\s+")).size / 200).coerceAtLeast(1)
     }
 
     private val searchResults = searchQuery
@@ -199,6 +214,7 @@ class HomeViewModel(
         editingFeed,
         showNewCategory,
         syncActive,
+        sortOrder,
     ) { values ->
         @Suppress("UNCHECKED_CAST")
         HomeUiState(
@@ -231,6 +247,7 @@ class HomeViewModel(
             editingFeed = values[26] as FeedWithCount?,
             showNewCategory = values[27] as Boolean,
             syncActive = values[28] as Boolean,
+            sortOrder = values[29] as SortOrder,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), HomeUiState())
 
@@ -257,6 +274,10 @@ class HomeViewModel(
 
     fun setFilter(f: ArticleFilter) {
         filter.value = f
+    }
+
+    fun setSortOrder(order: SortOrder) {
+        sortOrder.value = order
     }
 
     fun openFolder(id: Long) {

@@ -34,9 +34,13 @@ import androidx.compose.material.icons.rounded.RssFeed
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Sell
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Sort
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CollectionsBookmark
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,7 +59,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -400,8 +406,38 @@ private fun InboxTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long
             large = true,
             modifier = Modifier.padding(top = 16.dp),
             action = {
+                var sortMenu by remember { mutableStateOf(false) }
                 IconButton(onClick = { vm.setSearchActive(true) }) {
                     Icon(Icons.Rounded.Search, contentDescription = "Search")
+                }
+                Box {
+                    IconButton(onClick = { sortMenu = true }) {
+                        Icon(Icons.Rounded.Sort, contentDescription = "Sort")
+                    }
+                    DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
+                        SortOrder.entries.forEach { order ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        when (order) {
+                                            SortOrder.NEWEST -> "Newest first"
+                                            SortOrder.OLDEST -> "Oldest first"
+                                            SortOrder.READING_TIME -> "Longest reads"
+                                        }
+                                    )
+                                },
+                                onClick = {
+                                    vm.setSortOrder(order)
+                                    sortMenu = false
+                                },
+                                trailingIcon = {
+                                    if (state.sortOrder == order) {
+                                        Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    }
+                                },
+                            )
+                        }
+                    }
                 }
                 IconButton(onClick = vm::showSettings) {
                     Icon(Icons.Rounded.Settings, contentDescription = "Settings")
