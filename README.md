@@ -17,6 +17,20 @@ Save articles and read them in a clean reader mode, organize them with folders (
 - **Backup** — export/import your entire library (articles, folders, tags, feeds) as JSON
 - **Share integration** — share any link to Pouch to save it; deep links supported
 
+## Screenshots
+
+| Library | Reader (light) | Sepia reader |
+| --- | --- | --- |
+| ![Library](screenshots/library_light.png) | ![Article](screenshots/article_light.png) | ![Sepia article](screenshots/sepia_article.png) |
+
+| Feeds | Feed browse (dark) | Folders |
+| --- | --- | --- |
+| ![Feeds](screenshots/feeds_dark.png) | ![Feeds dark](screenshots/feeds2_dark.png) | ![Folders](screenshots/folders_light.png) |
+
+| Tags (dark) |
+| --- |
+| ![Tags](screenshots/tags_dark.png) |
+
 ## Building
 
 ```bash

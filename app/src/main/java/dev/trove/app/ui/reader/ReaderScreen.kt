@@ -367,6 +367,9 @@ fun ReaderScreen(
                         ) {
                             Icon(Icons.Rounded.TextIncrease, contentDescription = stringResource(R.string.reader_larger_text))
                         }
+                        RoundIconButton(onClick = vm::showReaderSettings) {
+                            Icon(Icons.Rounded.TextFields, contentDescription = stringResource(R.string.reader_reader_settings))
+                        }
                         RoundIconButton(
                             onClick = { vm.toggleFavorite(article.article.id, article.article.isFavorite) },
                         ) {
@@ -434,6 +437,8 @@ fun ReaderScreen(
                 runCatching { uriHandler.openUri(article.article.url) }
             },
             onDownloadOffline = { vm.downloadOffline(article) },
+            onManageHighlights = vm::showManageHighlights,
+            highlightCount = state.highlights.size,
             onDelete = {
                 scope.launch {
                     vm.deleteArticle(article)
