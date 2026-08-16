@@ -63,7 +63,7 @@ data class ReaderSettings(
     val feedInterval: FeedFetchInterval = FeedFetchInterval.OFF,
     /** How long unsaved feed items are kept. */
     val feedRetention: OfflineRetention = OfflineRetention.MONTH,
-    val syncOnStart: Boolean = true,
+    val syncOnStart: Boolean = false,
     val syncOnlyWifi: Boolean = false,
     val syncOnlyCharging: Boolean = false,
 )
@@ -91,7 +91,7 @@ class SettingsRepository(private val context: Context) {
             feedRetention = OfflineRetention.valueOf(
                 prefs[KEY_FEED_RETENTION] ?: OfflineRetention.MONTH.name
             ),
-            syncOnStart = prefs[KEY_SYNC_ON_START] ?: true,
+            syncOnStart = prefs[KEY_SYNC_ON_START] ?: false,
             syncOnlyWifi = prefs[KEY_SYNC_WIFI] ?: false,
             syncOnlyCharging = prefs[KEY_SYNC_CHARGING] ?: false,
         )

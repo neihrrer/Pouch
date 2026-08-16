@@ -35,6 +35,7 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.FileDownload
 import androidx.compose.material.icons.rounded.FileUpload
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.RssFeed
 import androidx.compose.material.icons.rounded.Save
@@ -75,6 +76,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -545,6 +547,7 @@ fun SettingsSheet(
     onDismiss: () -> Unit,
 ) {
     var section by remember { mutableStateOf<String?>(null) }
+    val uriHandler = LocalUriHandler.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     // Sliders drag on local state, persisted only when the gesture ends.
     var fontSize by remember(settings.fontSizeScale) { mutableStateOf(settings.fontSizeScale) }
@@ -763,6 +766,16 @@ fun SettingsSheet(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        Spacer(Modifier.height(12.dp))
+                        TextButton(onClick = { uriHandler.openUri("https://github.com/neihrrer/Pouch") }) {
+                            Icon(
+                                Icons.Rounded.OpenInNew,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text("github.com/neihrrer/Pouch")
+                        }
                     }
                 }
             }

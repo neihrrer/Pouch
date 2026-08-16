@@ -86,16 +86,16 @@ fun buildVersionName(): String {
     val now = LocalDate.now()
     val y = now.year
     val m = now.monthValue.toString().padStart(2, '0')
-    // x = number of releases in this month (git commits since month start)
-    val monthStart = "$y-$m-01"
+    // x = number of GitHub releases this month: count release tags (e.g.
+    // "2026.08", "2026.08.1", ...). The first release is .0.
+    val monthPrefix = "$y.$m"
     val release = runCatching {
-        ProcessBuilder("git", "rev-list", "--count", "--since=$monthStart", "HEAD")
+        ProcessBuilder("git", "tag", "--list", "$monthPrefix*")
             .redirectErrorStream(true)
             .start()
-            .inputStream.bufferedReader().readText().trim().toInt()
-            .coerceAtLeast(1)
-    }.getOrDefault(now.dayOfMonth)
-    return "$y.$m.$release"
+            .inputStream.bufferedReader().readLines().size
+    }.getOrDefault(0)
+    return "$monthPrefix.${(release - 1).coerceAtLeast(0)}"
 }
 
 dependencies {
