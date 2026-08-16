@@ -75,6 +75,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -86,6 +87,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.trove.app.BuildConfig
+import dev.trove.app.R
 import dev.trove.app.data.db.HighlightEntity
 import dev.trove.app.data.FeedFetchInterval
 import dev.trove.app.data.OfflineRetention
@@ -252,7 +254,7 @@ fun ReaderScreen(
                     )
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        "This article has no saved content yet.",
+                        stringResource(R.string.reader_no_content_title),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -260,7 +262,7 @@ fun ReaderScreen(
                     Spacer(Modifier.height(16.dp))
                     ExpressiveButton(
                         onClick = { vm.refresh(article) },
-                        text = if (state.refreshing) "Refreshing…" else "Fetch content",
+                        text = if (state.refreshing) stringResource(R.string.reader_refreshing) else stringResource(R.string.reader_fetch_content),
                     )
                 }
             }
@@ -304,7 +306,7 @@ fun ReaderScreen(
                             )
                             Spacer(Modifier.height(12.dp))
                             Text(
-                                "You've reached the end",
+                                stringResource(R.string.reader_end),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -344,7 +346,7 @@ fun ReaderScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RoundIconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back))
                         }
                         Spacer(Modifier.weight(1f))
                         RoundIconButton(
@@ -354,7 +356,7 @@ fun ReaderScreen(
                                 )
                             },
                         ) {
-                            Icon(Icons.Rounded.TextDecrease, contentDescription = "Smaller text")
+                            Icon(Icons.Rounded.TextDecrease, contentDescription = stringResource(R.string.reader_smaller_text))
                         }
                         RoundIconButton(
                             onClick = {
@@ -363,7 +365,7 @@ fun ReaderScreen(
                                 )
                             },
                         ) {
-                            Icon(Icons.Rounded.TextIncrease, contentDescription = "Larger text")
+                            Icon(Icons.Rounded.TextIncrease, contentDescription = stringResource(R.string.reader_larger_text))
                         }
                         RoundIconButton(
                             onClick = { vm.toggleFavorite(article.article.id, article.article.isFavorite) },
@@ -371,13 +373,13 @@ fun ReaderScreen(
                             Icon(
                                 if (article.article.isFavorite) Icons.Rounded.Bookmark
                                 else Icons.Rounded.BookmarkBorder,
-                                contentDescription = "Favorite",
+                                contentDescription = stringResource(R.string.lib_swipe_favorite),
                                 tint = if (article.article.isFavorite) MaterialTheme.colorScheme.primary
                                 else MaterialTheme.colorScheme.onSurface,
                             )
                         }
                         RoundIconButton(onClick = vm::showActionsSheet) {
-                            Icon(Icons.Rounded.MoreVert, contentDescription = "More")
+                            Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.common_more))
                         }
                     }
                 }
@@ -422,7 +424,7 @@ fun ReaderScreen(
                     vm.hideActionsSheet()
                     runCatching {
                         context.startActivity(
-                            android.content.Intent.createChooser(intent, "Share link")
+                            android.content.Intent.createChooser(intent, context.getString(R.string.reader_share_link))
                         )
                     }
                 }
@@ -451,14 +453,14 @@ fun ReaderScreen(
     }
     if (state.newFolderVisible && article != null) {
         NewEntitySheet(
-            title = "New folder",
+            title = stringResource(R.string.folders_new),
             onCreate = { name, color, _ -> vm.createFolderAndApply(article.article.id, name, color) },
             onDismiss = vm::hideNewFolder,
         )
     }
     if (state.newTagVisible && article != null) {
         NewEntitySheet(
-            title = "New tag",
+            title = stringResource(R.string.tags_new),
             onCreate = { name, color, _ -> vm.createTagAndApply(article.article.id, name, color) },
             onDismiss = vm::hideNewTag,
         )
@@ -522,12 +524,12 @@ private fun HighlightsSheet(
                 .padding(bottom = 32.dp),
         ) {
             Text(
-                if (highlights.isEmpty()) "No highlights yet" else "Highlights (${highlights.size})",
+                if (highlights.isEmpty()) stringResource(R.string.reader_no_highlights_title) else stringResource(R.string.reader_highlights_count, highlights.size),
                 style = MaterialTheme.typography.headlineSmall,
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                "Select text in the article, then pick a color from the bar.",
+                stringResource(R.string.reader_no_highlights_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -535,8 +537,8 @@ private fun HighlightsSheet(
             if (highlights.isEmpty()) {
                 EmptyState(
                     icon = Icons.Rounded.FormatColorFill,
-                    title = "Nothing highlighted",
-                    subtitle = "Long-press and drag across text to select it, then choose a color.",
+                    title = stringResource(R.string.reader_nothing_highlighted),
+                    subtitle = stringResource(R.string.reader_highlight_hint),
                 )
             } else {
                 LazyColumn(modifier = Modifier.heightIn(max = 420.dp)) {
@@ -561,7 +563,7 @@ private fun HighlightsSheet(
                             IconButton(onClick = { onDelete(highlight) }) {
                                 Icon(
                                     Icons.Rounded.Delete,
-                                    contentDescription = "Remove highlight",
+                                    contentDescription = stringResource(R.string.reader_remove_highlight),
                                     tint = MaterialTheme.colorScheme.error,
                                 )
                             }

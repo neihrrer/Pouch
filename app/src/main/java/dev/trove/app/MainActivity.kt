@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
             putExtra(Intent.EXTRA_TEXT, url)
         }
         runCatching {
-            startActivity(Intent.createChooser(send, "Share link"))
+            startActivity(Intent.createChooser(send, getString(R.string.reader_share_link)))
         }
     }
 }

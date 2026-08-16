@@ -41,9 +41,9 @@ class TroveApplication : Application(), SingletonImageLoader.Factory {
     }
     val settingsRepository: SettingsRepository by lazy { SettingsRepository(this) }
     val feedRepository: FeedRepository by lazy {
-        FeedRepository(database, WebFetcher(), ReaderExtractor())
+        FeedRepository(this, database, WebFetcher(), ReaderExtractor())
     }
-    val backupRepository: BackupRepository by lazy { BackupRepository(database) }
+    val backupRepository: BackupRepository by lazy { BackupRepository(this, database) }
 
     /** URL shared into the app (share sheet / deep link), consumed by Home. */
     val pendingShareUrl = MutableStateFlow<String?>(null)
@@ -80,7 +80,7 @@ class TroveApplication : Application(), SingletonImageLoader.Factory {
         }
         initializer<ReaderViewModel> {
             val id = createSavedStateHandle().get<Long>("articleId") ?: 0L
-            ReaderViewModel(repository, settingsRepository, id)
+            ReaderViewModel(applicationContext, repository, settingsRepository, id)
         }
     }
 }

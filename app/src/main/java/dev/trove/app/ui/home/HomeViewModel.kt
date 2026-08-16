@@ -19,6 +19,7 @@ import dev.trove.app.data.ReaderFont
 import dev.trove.app.data.ReaderSettings
 import dev.trove.app.data.SettingsRepository
 import dev.trove.app.data.ThemeMode
+import dev.trove.app.R
 import dev.trove.app.data.db.ArticleWithTags
 import dev.trove.app.data.db.FeedCategoryEntity
 import dev.trove.app.data.db.FeedWithCount
@@ -336,7 +337,7 @@ class HomeViewModel(
                     }
                 }
                 is AddUrlResult.AlreadySaved -> {
-                    SnackbarBus.post(SnackbarBus.Event("Already in your library"))
+                    SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_already_library)))
                     addSheetVisible.value = false
                     addState.value = AddState.Idle
                     openArticleEvents.emit(result.articleId)
@@ -393,7 +394,7 @@ class HomeViewModel(
             actionsArticle.value = null
             val tagIds = article.tags.map { it.id }
             SnackbarBus.post(
-                SnackbarBus.Event("Article deleted", "Undo") {
+                SnackbarBus.Event(appContext.getString(R.string.snack_article_deleted), appContext.getString(R.string.common_undo)) {
                     viewModelScope.launch { repo.restoreArticle(article.article, tagIds) }
                 }
             )
@@ -404,8 +405,11 @@ class HomeViewModel(
         viewModelScope.launch {
             val result = repo.downloadForOffline(article.article)
             val msg = result.fold(
-                onSuccess = { n -> if (n > 0) "Saved for offline reading ($n images)" else "Article text is already stored offline" },
-                onFailure = { "Couldn't download images" },
+                onSuccess = { n ->
+                    if (n > 0) appContext.getString(R.string.snack_offline_saved, n)
+                    else appContext.getString(R.string.snack_offline_text_only)
+                },
+                onFailure = { appContext.getString(R.string.snack_offline_failed) },
             )
             SnackbarBus.post(SnackbarBus.Event(msg))
         }
@@ -419,7 +423,7 @@ class HomeViewModel(
 
     fun downloadAllOffline() {
         viewModelScope.launch {
-            SnackbarBus.post(SnackbarBus.Event("Downloading articles for offline…"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_offline_downloading)))
             val all = repo.getAllArticles()
             var done = 0
             all.forEach { article ->
@@ -427,7 +431,9 @@ class HomeViewModel(
                 if (r.isSuccess && r.getOrNull()!! > 0) done++
             }
             SnackbarBus.post(
-                SnackbarBus.Event("Offline downloads complete ($done of ${all.size} articles)")
+                SnackbarBus.Event(
+                    appContext.getString(R.string.snack_offline_done, done, all.size)
+                )
             )
         }
     }
@@ -442,7 +448,7 @@ class HomeViewModel(
             if (retention != OfflineRetention.ALWAYS) {
                 val removed = repo.cleanupOfflineDownloads(retention)
                 if (removed > 0) {
-                    SnackbarBus.post(SnackbarBus.Event("Expired $removed offline copies"))
+                    SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_offline_expired, "$removed")))
                 }
             }
         }
@@ -486,7 +492,7 @@ class HomeViewModel(
             repo.deleteFolder(folder.folder)
             editingFolder.value = null
             if (browsingFolder.value == folder.folder.id) browsingFolder.value = null
-            SnackbarBus.post(SnackbarBus.Event("Folder deleted"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_folder_deleted)))
         }
     }
 
@@ -511,7 +517,7 @@ class HomeViewModel(
             repo.deleteTag(tag.tag)
             editingTag.value = null
             if (browsingTag.value == tag.tag.id) browsingTag.value = null
-            SnackbarBus.post(SnackbarBus.Event("Tag deleted"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_tag_deleted)))
         }
     }
 
@@ -583,13 +589,13 @@ class HomeViewModel(
             result.fold(
                 onSuccess = { feed ->
                     showAddFeedSheet.value = false
-                    SnackbarBus.post(SnackbarBus.Event("Subscribed to ${feed.title}"))
+                    SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_subscribed, "${feed.title}")))
                     viewModelScope.launch {
                         val n = feedRepo.fetchFeed(feed).getOrDefault(0)
-                        if (n > 0) SnackbarBus.post(SnackbarBus.Event("Imported $n articles"))
+                        if (n > 0) SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_imported_articles, "$n")))
                     }
                 },
-                onFailure = { SnackbarBus.post(SnackbarBus.Event("Couldn't add feed: ${it.message?.take(60)}")) },
+                onFailure = { SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_couldnt_add_feed, "${it.message?.take(60)}"))) },
             )
         }
     }
@@ -597,7 +603,7 @@ class HomeViewModel(
     fun saveFeedItem(article: ArticleWithTags) {
         viewModelScope.launch {
             repo.saveFeedItem(article.article.id)
-            SnackbarBus.post(SnackbarBus.Event("Added to Library"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_added_library)))
         }
     }
 
@@ -614,9 +620,10 @@ class HomeViewModel(
 
     fun fetchAllFeeds() {
         viewModelScope.launch {
-            SnackbarBus.post(SnackbarBus.Event("Refreshing feeds…"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_refreshing_feeds)))
             val n = feedRepo.fetchAllFeeds()
-            SnackbarBus.post(SnackbarBus.Event(if (n > 0) "Imported $n new articles" else "All feeds up to date"))
+            SnackbarBus.post(SnackbarBus.Event(if (n > 0) appContext.getString(R.string.snack_imported_new, n)
+                        else appContext.getString(R.string.snack_feeds_up_to_date)))
         }
     }
 
@@ -640,7 +647,7 @@ class HomeViewModel(
         viewModelScope.launch {
             feedRepo.deleteFeed(feed.feed)
             editingFeed.value = null
-            SnackbarBus.post(SnackbarBus.Event("Feed removed"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_feed_removed)))
         }
     }
 
@@ -664,7 +671,7 @@ class HomeViewModel(
         viewModelScope.launch {
             feedRepo.deleteCategory(category)
             if (selectedFeedCategoryId.value == category.id) selectedFeedCategoryId.value = null
-            SnackbarBus.post(SnackbarBus.Event("Category deleted"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_category_deleted)))
         }
     }
 
@@ -692,10 +699,11 @@ class HomeViewModel(
                     val added = info.outputData.getInt(FeedSyncWorker.KEY_ADDED, 0)
                     val imported = info.outputData.getInt(FeedSyncWorker.KEY_IMPORTED, 0)
                     val msg = when {
-                        name == FeedSyncWorker.OPML_WORK && imported > 0 -> "Imported $imported feeds"
-                        name == FeedSyncWorker.OPML_WORK -> "No feeds found in the file"
-                        added > 0 -> "Imported $added new articles"
-                        else -> "All feeds up to date"
+                        name == FeedSyncWorker.OPML_WORK && imported > 0 ->
+                            appContext.getString(R.string.snack_imported_feeds, imported)
+                        name == FeedSyncWorker.OPML_WORK -> appContext.getString(R.string.snack_no_feeds_found)
+                        added > 0 -> appContext.getString(R.string.snack_imported_new, added)
+                        else -> appContext.getString(R.string.snack_feeds_up_to_date)
                     }
                     SnackbarBus.post(SnackbarBus.Event(msg))
                 }
@@ -716,8 +724,8 @@ class HomeViewModel(
             val json = backupRepo.export()
             runCatching {
                 appContext.contentResolver.openOutputStream(uri)?.writer()?.use { it.write(json) }
-                SnackbarBus.post(SnackbarBus.Event("Backup exported"))
-            }.onFailure { SnackbarBus.post(SnackbarBus.Event("Couldn't export backup")) }
+                SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_backup_exported)))
+            }.onFailure { SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_backup_export_failed))) }
         }
     }
 
@@ -728,16 +736,16 @@ class HomeViewModel(
                 appContext.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
             }.getOrNull()
             if (json.isNullOrBlank()) {
-                SnackbarBus.post(SnackbarBus.Event("Couldn't read backup file"))
+                SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_backup_import_failed)))
                 return@launch
             }
             val summary = backupRepo.import(json)
-            SnackbarBus.post(SnackbarBus.Event(summary))
+            SnackbarBus.post(SnackbarBus.Event(summary)) // localized in BackupRepository
         }
     }
 
     fun exportBackupFile() {
-        SnackbarBus.post(SnackbarBus.Event("Choose where to save the backup"))
+        SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_backup_choose_save)))
         backupExportRequested = true
     }
 
@@ -748,7 +756,7 @@ class HomeViewModel(
     var backupImportRequested by mutableStateOf(false)
         private set
     fun importBackupFile() {
-        SnackbarBus.post(SnackbarBus.Event("Choose a backup file to import"))
+        SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_backup_choose_import)))
         backupImportRequested = true
     }
     fun onBackupImportHandled() { backupImportRequested = false }
@@ -766,7 +774,7 @@ class HomeViewModel(
         viewModelScope.launch {
             settingsRepo.setFeedRetention(retention)
             val removed = repo.cleanupFeedItems(retention)
-            if (removed > 0) SnackbarBus.post(SnackbarBus.Event("Expired $removed old feed items"))
+            if (removed > 0) SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_feed_items_expired, "$removed")))
         }
     }
 

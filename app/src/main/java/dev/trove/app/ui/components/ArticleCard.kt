@@ -30,12 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import dev.trove.app.R
 import dev.trove.app.data.db.ArticleWithTags
 import dev.trove.app.ui.theme.accentColor
 import dev.trove.app.util.LocalImagesJson
@@ -84,13 +86,13 @@ fun ArticleCard(
                     color = Color(0xFFF5A623),
                     icon = if (article.article.isFavorite) Icons.Rounded.Bookmark
                     else Icons.Rounded.BookmarkBorder,
-                    label = if (article.article.isFavorite) "Unfavorite" else "Favorite",
+                    label = if (article.article.isFavorite) stringResource(R.string.lib_swipe_unfavorite) else stringResource(R.string.lib_swipe_favorite),
                     alignEnd = false,
                 )
                 SwipeToDismissBoxValue.EndToStart -> SwipeBackground(
                     color = Color(0xFFC62828),
                     icon = Icons.Rounded.Delete,
-                    label = "Delete",
+                    label = stringResource(R.string.lib_swipe_delete),
                     alignEnd = true,
                 )
                 else -> {}
@@ -136,7 +138,7 @@ fun ArticleCard(
                             )
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                text = "$minutes min read",
+                                text = stringResource(R.string.lib_min_read, minutes),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -145,7 +147,7 @@ fun ArticleCard(
                             Spacer(Modifier.width(8.dp))
                             Icon(
                                 Icons.Rounded.Bookmark,
-                                contentDescription = "Favorite",
+                                contentDescription = stringResource(R.string.lib_swipe_favorite),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(16.dp),
                             )
@@ -154,7 +156,7 @@ fun ArticleCard(
                             Spacer(Modifier.width(8.dp))
                             Icon(
                                 Icons.Rounded.DownloadDone,
-                                contentDescription = "Offline copy saved",
+                                contentDescription = stringResource(R.string.lib_offline_badge),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(16.dp),
                             )

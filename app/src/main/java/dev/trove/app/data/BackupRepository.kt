@@ -1,5 +1,6 @@
 package dev.trove.app.data
 
+import dev.trove.app.R
 import dev.trove.app.data.db.AppDatabase
 import dev.trove.app.data.db.ArticleEntity
 import dev.trove.app.data.db.ArticleTagCrossRef
@@ -17,7 +18,7 @@ import org.json.JSONObject
  * Full-library backup: folders, tags, saved articles (with tags, folder,
  * read/favorite state) and feed subscriptions. Plain JSON.
  */
-class BackupRepository(private val db: AppDatabase) {
+class BackupRepository(private val context: android.content.Context, private val db: AppDatabase) {
 
     suspend fun export(): String = withContext(Dispatchers.IO) {
         val a = db.articleDao()
@@ -165,6 +166,6 @@ class BackupRepository(private val db: AppDatabase) {
                 articleCount++
             }
         }
-        "Imported $articleCount articles, ${folderIds.size} folders, ${tagIds.size} tags"
+        context.getString(R.string.snack_backup_summary, articleCount, folderIds.size, tagIds.size)
     }
 }

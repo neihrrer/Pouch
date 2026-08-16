@@ -1,5 +1,6 @@
 package dev.trove.app.data
 
+import dev.trove.app.R
 import dev.trove.app.data.db.AppDatabase
 import dev.trove.app.data.db.ArticleEntity
 import dev.trove.app.data.db.ArticleTagCrossRef
@@ -50,7 +51,7 @@ class ArticleRepository(
         val url = try {
             normalizeUrl(rawUrl)
         } catch (e: Exception) {
-            return@withContext AddUrlResult.Failed("That doesn't look like a valid link")
+            return@withContext AddUrlResult.Failed(context.getString(R.string.err_invalid_link))
         }
         val existing = articles.getByUrl(url)
         if (existing != null) return@withContext AddUrlResult.AlreadySaved(existing.id)
@@ -77,16 +78,16 @@ class ArticleRepository(
             AddUrlResult.Added(id)
         } catch (e: FetchException.HttpError) {
             val msg = when (e.code) {
-                403, 451 -> "This site blocked automated access (${e.code}). Try opening it in a browser instead."
-                404 -> "This link doesn't exist (404)."
-                429 -> "This site is rate-limiting requests right now (429). Try again later."
+                403, 451 -> context.getString(R.string.err_blocked, e.code)
+                404 -> context.getString(R.string.err_not_found)
+                429 -> context.getString(R.string.err_rate_limited)
                 else -> e.message ?: "Couldn't fetch this page"
             }
             AddUrlResult.Failed(msg)
         } catch (e: FetchException) {
-            AddUrlResult.Failed(e.message ?: "Couldn't fetch this page")
+            AddUrlResult.Failed(e.message ?: context.getString(R.string.err_fetch))
         } catch (e: Exception) {
-            AddUrlResult.Failed("Something went wrong: ${e.message?.take(80)}")
+            AddUrlResult.Failed(context.getString(R.string.err_generic, e.message?.take(80) ?: ""))
         }
     }
 

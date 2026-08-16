@@ -77,12 +77,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.trove.app.data.FeedFetchInterval
 import dev.trove.app.data.OfflineRetention
+import dev.trove.app.R
 import dev.trove.app.data.ReaderAlign
 import dev.trove.app.data.ReaderFont
 import dev.trove.app.data.ReaderSettings
@@ -118,10 +120,10 @@ fun AddUrlSheet(
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 32.dp),
         ) {
-            Text("Save a link", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.sheet_save_link_title), style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(4.dp))
             Text(
-                "We'll fetch the page and save it in reader mode",
+                stringResource(R.string.sheet_save_link_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -130,13 +132,13 @@ fun AddUrlSheet(
                 value = prefill,
                 onValueChange = onTextChange,
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("https://example.com/article") },
+                placeholder = { Text(stringResource(R.string.sheet_url_hint)) },
                 leadingIcon = { Icon(Icons.Rounded.Link, contentDescription = null) },
                 trailingIcon = {
                     IconButton(onClick = {
                         clipboard.getText()?.text?.let(onTextChange)
                     }) {
-                        Icon(Icons.Rounded.ContentCopy, contentDescription = "Paste")
+                        Icon(Icons.Rounded.ContentCopy, contentDescription = stringResource(R.string.common_paste))
                     }
                 },
                 shape = RoundedCornerShape(50),
@@ -156,7 +158,7 @@ fun AddUrlSheet(
             Spacer(Modifier.height(20.dp))
             ExpressiveButton(
                 onClick = onAdd,
-                text = if (state is AddState.Working) "Fetching…" else "Save article",
+                text = if (state is AddState.Working) stringResource(R.string.sheet_fetching) else stringResource(R.string.sheet_save_article),
                 icon = Icons.Rounded.AddLink,
                 modifier = Modifier.fillMaxWidth(),
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -263,7 +265,7 @@ fun ArticleActionsSheet(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 AccentChip(
-                    text = "No folder",
+                    text = stringResource(R.string.sheet_no_folder),
                     colorIndex = 0,
                     selected = a.folderId == null,
                     onClick = { onMoveToFolder(null) },
@@ -279,7 +281,7 @@ fun ArticleActionsSheet(
                     )
                 }
                 AccentChip(
-                    text = "New",
+                    text = stringResource(R.string.common_create),
                     colorIndex = 4,
                     selected = false,
                     onClick = onNewFolder,
@@ -304,7 +306,7 @@ fun ArticleActionsSheet(
                     )
                 }
                 AccentChip(
-                    text = "New",
+                    text = stringResource(R.string.common_create),
                     colorIndex = 5,
                     selected = false,
                     onClick = onNewTag,
@@ -319,51 +321,51 @@ fun ArticleActionsSheet(
             if (!isSaved && onSaveToLibrary != null) {
                 ActionRow(
                     icon = Icons.Rounded.BookmarkAdd,
-                    label = "Add to Library",
+                    label = stringResource(R.string.sheet_add_to_library),
                     onClick = onSaveToLibrary,
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
             ActionRow(
                 icon = if (a.isRead) Icons.Rounded.DoneAll else Icons.Rounded.Done,
-                label = if (a.isRead) "Mark as unread" else "Mark as read",
+                label = if (a.isRead) stringResource(R.string.sheet_mark_unread) else stringResource(R.string.sheet_mark_read),
                 onClick = onToggleRead,
             )
             ActionRow(
                 icon = if (a.isFavorite) Icons.Rounded.Bookmark else Icons.Rounded.BookmarkBorder,
-                label = if (a.isFavorite) "Remove favorite" else "Add to favorites",
+                label = if (a.isFavorite) stringResource(R.string.sheet_remove_favorite) else stringResource(R.string.sheet_add_to_favorites),
                 onClick = onToggleFavorite,
             )
             ActionRow(
                 icon = Icons.Rounded.Refresh,
-                label = "Refresh content",
+                label = stringResource(R.string.sheet_refresh_content),
                 onClick = onRefresh,
             )
             ActionRow(
                 icon = if (a.offlineReady) Icons.Rounded.DownloadDone else Icons.Rounded.Download,
-                label = if (a.offlineReady) "Offline copy saved" else "Download for offline",
+                label = if (a.offlineReady) stringResource(R.string.sheet_offline_saved) else stringResource(R.string.sheet_download_offline),
                 onClick = onDownloadOffline,
             )
             if (onManageHighlights != null) {
                 ActionRow(
                     icon = Icons.Rounded.FormatColorFill,
-                    label = if (highlightCount > 0) "Highlights ($highlightCount)" else "Highlights",
+                    label = if (highlightCount > 0) stringResource(R.string.reader_highlights_count, highlightCount) else stringResource(R.string.reader_highlights),
                     onClick = onManageHighlights,
                 )
             }
             ActionRow(
                 icon = Icons.Rounded.Share,
-                label = "Share link",
+                label = stringResource(R.string.reader_share_link),
                 onClick = onShare,
             )
             ActionRow(
                 icon = Icons.Rounded.OpenInBrowser,
-                label = "Open in browser",
+                label = stringResource(R.string.sheet_open_browser),
                 onClick = onOpenInBrowser,
             )
             ActionRow(
                 icon = Icons.Rounded.Delete,
-                label = "Delete article",
+                label = stringResource(R.string.sheet_delete_article),
                 onClick = onDelete,
                 tint = MaterialTheme.colorScheme.error,
             )
@@ -427,7 +429,7 @@ fun NewEntitySheet(
                 value = name,
                 onValueChange = { name = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Name") },
+                placeholder = { Text(stringResource(R.string.common_name)) },
                 leadingIcon = { Icon(Icons.Rounded.Edit, null) },
                 shape = RoundedCornerShape(50),
                 singleLine = true,
@@ -435,14 +437,14 @@ fun NewEntitySheet(
 
             if (showParentPicker && folders.isNotEmpty()) {
                 Spacer(Modifier.height(16.dp))
-                Text("Inside", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.common_inside), style = MaterialTheme.typography.labelLarge)
                 Spacer(Modifier.height(8.dp))
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     AccentChip(
-                        text = "Top level",
+                        text = stringResource(R.string.common_top_level),
                         colorIndex = 0,
                         selected = parentId == null,
                         onClick = { parentId = null },
@@ -460,7 +462,7 @@ fun NewEntitySheet(
 
             if (showColorPicker) {
                 Spacer(Modifier.height(16.dp))
-                Text("Color", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.common_color), style = MaterialTheme.typography.labelLarge)
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     (0 until AccentColorCount).forEach { i ->
@@ -492,7 +494,7 @@ fun NewEntitySheet(
             Spacer(Modifier.height(20.dp))
             ExpressiveButton(
                 onClick = { if (name.isNotBlank()) onCreate(name.trim(), colorIndex, parentId) },
-                text = if (isEdit) "Save changes" else "Create",
+                text = if (isEdit) stringResource(R.string.common_save_changes) else stringResource(R.string.common_create),
                 icon = if (isEdit) Icons.Rounded.Done else Icons.Rounded.Add,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -512,7 +514,7 @@ fun NewEntitySheet(
                         modifier = Modifier.size(20.dp),
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.common_delete), color = MaterialTheme.colorScheme.error)
                 }
             }
         }
@@ -564,15 +566,15 @@ fun SettingsSheet(
         ) {
             if (section == null) {
                 // ------------------------------------------------- overview
-                Text("Settings", style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.height(16.dp))
-                SettingsNavRow("Appearance", "Theme, colors, OLED", Icons.Rounded.Palette) { section = "appearance" }
-                SettingsNavRow("Reading", "Font, alignment, spacing", Icons.Rounded.TextFields) { section = "reading" }
-                SettingsNavRow("Feeds", "Refresh, retention, sync", Icons.Rounded.RssFeed) { section = "feeds" }
+                SettingsNavRow(stringResource(R.string.settings_appearance), stringResource(R.string.settings_appearance_subtitle), Icons.Rounded.Palette) { section = "appearance" }
+                SettingsNavRow(stringResource(R.string.settings_reading), stringResource(R.string.settings_reading_subtitle), Icons.Rounded.TextFields) { section = "reading" }
+                SettingsNavRow(stringResource(R.string.settings_feeds), stringResource(R.string.settings_feeds_subtitle), Icons.Rounded.RssFeed) { section = "feeds" }
                 if (onExportBackup != null || onImportBackup != null) {
-                    SettingsNavRow("Data", "Backup & restore your library", Icons.Rounded.Save) { section = "data" }
+                    SettingsNavRow(stringResource(R.string.settings_data), stringResource(R.string.settings_data_subtitle), Icons.Rounded.Save) { section = "data" }
                 }
-                SettingsNavRow("About", versionName.ifBlank { "Pouch" }, Icons.Rounded.Info) { section = "about" }
+                SettingsNavRow(stringResource(R.string.settings_about), versionName.ifBlank { stringResource(R.string.app_name) }, Icons.Rounded.Info) { section = "about" }
             } else {
                 // ------------------------------------------------- section
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -581,11 +583,11 @@ fun SettingsSheet(
                     }
                     Text(
                         when (section) {
-                            "appearance" -> "Appearance"
-                            "reading" -> "Reading"
-                            "feeds" -> "Feeds"
-                            "data" -> "Data"
-                            else -> "About"
+                            "appearance" -> stringResource(R.string.settings_appearance)
+                            "reading" -> stringResource(R.string.settings_reading)
+                            "feeds" -> stringResource(R.string.settings_feeds)
+                            "data" -> stringResource(R.string.settings_data)
+                            else -> stringResource(R.string.settings_about)
                         },
                         style = MaterialTheme.typography.headlineSmall,
                     )
@@ -594,7 +596,7 @@ fun SettingsSheet(
 
                 when (section) {
                     "appearance" -> {
-                        Text("Theme", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_theme), style = MaterialTheme.typography.labelLarge)
                         Spacer(Modifier.height(8.dp))
                         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
                             ThemeMode.entries.forEachIndexed { index, mode ->
@@ -603,37 +605,37 @@ fun SettingsSheet(
                                     onClick = { onThemeMode(mode) },
                                     shape = SegmentedButtonDefaults.itemShape(index = index, count = ThemeMode.entries.size),
                                 ) {
-                                    Text(mode.name.lowercase().replaceFirstChar { it.uppercase() })
+                                    Text(themeModeLabel(mode))
                                 }
                             }
                         }
                         Spacer(Modifier.height(8.dp))
                         SettingRow(
-                            title = "Dynamic color",
-                            subtitle = "Match the system wallpaper palette",
+                            title = stringResource(R.string.settings_dynamic_color),
+                            subtitle = stringResource(R.string.settings_dynamic_color_subtitle),
                             trailing = { Switch(checked = settings.dynamicColor, onCheckedChange = onDynamicColor) },
                         )
                         SettingRow(
-                            title = "True OLED",
-                            subtitle = "Pure black backgrounds in dark mode",
+                            title = stringResource(R.string.settings_oled),
+                            subtitle = stringResource(R.string.settings_oled_subtitle),
                             trailing = { Switch(checked = settings.oled, onCheckedChange = onOled) },
                         )
                     }
 
                     "reading" -> {
                         Text(
-                            "These only apply in reader mode",
+                            stringResource(R.string.settings_reading_hint),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(Modifier.height(12.dp))
-                        Text("Typeface", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_typeface), style = MaterialTheme.typography.labelLarge)
                         Spacer(Modifier.height(8.dp))
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             ReaderFont.entries.forEach { font ->
                                 val selected = settings.readerFont == font
                                 AccentChip(
-                                    text = font.name.lowercase().replaceFirstChar { it.uppercase() },
+                                    text = readerFontLabel(font),
                                     colorIndex = font.ordinal + 2,
                                     selected = selected,
                                     onClick = { onReaderFont(font) },
@@ -641,13 +643,13 @@ fun SettingsSheet(
                             }
                         }
                         Spacer(Modifier.height(12.dp))
-                        Text("Alignment", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_alignment), style = MaterialTheme.typography.labelLarge)
                         Spacer(Modifier.height(8.dp))
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             ReaderAlign.entries.forEach { align ->
                                 val selected = settings.textAlign == align
                                 AccentChip(
-                                    text = align.name.lowercase().replaceFirstChar { it.uppercase() },
+                                    text = readerAlignLabel(align),
                                     colorIndex = 0,
                                     selected = selected,
                                     onClick = { onTextAlign(align) },
@@ -655,28 +657,28 @@ fun SettingsSheet(
                             }
                         }
                         Spacer(Modifier.height(12.dp))
-                        Text("Text size", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_text_size), style = MaterialTheme.typography.labelLarge)
                         Slider(value = fontSize, onValueChange = { fontSize = it },
                             onValueChangeFinished = { onFontSize(fontSize) }, valueRange = 0.8f..1.5f, steps = 7)
-                        Text("Line spacing", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_line_spacing), style = MaterialTheme.typography.labelLarge)
                         Slider(value = lineHeight, onValueChange = { lineHeight = it },
                             onValueChangeFinished = { onLineHeight(lineHeight) }, valueRange = 0.8f..1.6f, steps = 7)
-                        Text("Letter spacing", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_letter_spacing), style = MaterialTheme.typography.labelLarge)
                         Slider(value = letterSpacing, onValueChange = { letterSpacing = it },
                             onValueChangeFinished = { onLetterSpacing(letterSpacing) }, valueRange = 0f..2f, steps = 7)
-                        Text("Word spacing", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_word_spacing), style = MaterialTheme.typography.labelLarge)
                         Slider(value = wordSpacing, onValueChange = { wordSpacing = it },
                             onValueChangeFinished = { onWordSpacing(wordSpacing) }, valueRange = 0f..1.5f, steps = 7)
                     }
 
                     "feeds" -> {
-                        Text("Refresh frequency", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_feed_interval), style = MaterialTheme.typography.labelLarge)
                         Spacer(Modifier.height(8.dp))
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             FeedFetchInterval.entries.forEach { interval ->
                                 val selected = settings.feedInterval == interval
                                 AccentChip(
-                                    text = interval.label,
+                                    text = intervalLabel(interval),
                                     colorIndex = 1,
                                     selected = selected,
                                     onClick = { onFeedInterval(interval) },
@@ -684,13 +686,13 @@ fun SettingsSheet(
                             }
                         }
                         Spacer(Modifier.height(12.dp))
-                        Text("Keep feed items for", style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.settings_feed_retention), style = MaterialTheme.typography.labelLarge)
                         Spacer(Modifier.height(8.dp))
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             OfflineRetention.entries.forEach { retention ->
                                 val selected = settings.feedRetention == retention
                                 AccentChip(
-                                    text = retention.label,
+                                    text = retentionLabel(retention),
                                     colorIndex = 2,
                                     selected = selected,
                                     onClick = { onFeedRetention(retention) },
@@ -699,18 +701,18 @@ fun SettingsSheet(
                         }
                         Spacer(Modifier.height(8.dp))
                         SettingRow(
-                            title = "Sync on start",
-                            subtitle = "Refresh feeds when the app opens",
+                            title = stringResource(R.string.settings_sync_on_start),
+                            subtitle = stringResource(R.string.settings_sync_on_start_subtitle),
                             trailing = { Switch(checked = settings.syncOnStart, onCheckedChange = onSyncOnStart) },
                         )
                         SettingRow(
-                            title = "Wi-Fi only",
-                            subtitle = "Background sync only on unmetered networks",
+                            title = stringResource(R.string.settings_wifi_only),
+                            subtitle = stringResource(R.string.settings_wifi_only_subtitle),
                             trailing = { Switch(checked = settings.syncOnlyWifi, onCheckedChange = onSyncOnlyWifi) },
                         )
                         SettingRow(
-                            title = "While charging only",
-                            subtitle = "Background sync only when plugged in",
+                            title = stringResource(R.string.settings_charging_only),
+                            subtitle = stringResource(R.string.settings_charging_only_subtitle),
                             trailing = { Switch(checked = settings.syncOnlyCharging, onCheckedChange = onSyncOnlyCharging) },
                         )
                     }
@@ -719,7 +721,7 @@ fun SettingsSheet(
                         if (onExportBackup != null) {
                             ExpressiveButton(
                                 onClick = onExportBackup,
-                                text = "Export all data",
+                                text = stringResource(R.string.settings_export_data),
                                 icon = Icons.Rounded.FileUpload,
                                 modifier = Modifier.fillMaxWidth(),
                             )
@@ -728,41 +730,41 @@ fun SettingsSheet(
                         if (onImportBackup != null) {
                             ExpressiveButton(
                                 onClick = onImportBackup,
-                                text = "Import all data",
+                                text = stringResource(R.string.settings_import_data),
                                 icon = Icons.Rounded.FileDownload,
                                 modifier = Modifier.fillMaxWidth(),
                             )
                         }
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Backups include saved articles, folders, tags, highlights and feed subscriptions as a JSON file.",
+                            stringResource(R.string.settings_backup_hint),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
 
                     else -> {
-                        Text("Pouch", style = MaterialTheme.typography.titleLarge)
+                        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.titleLarge)
                         Spacer(Modifier.height(2.dp))
                         Text(
-                            "Version $versionName",
+                            stringResource(R.string.settings_version, versionName),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            "A read-later app with an RSS reader, folders, tags and offline reading.",
+                            stringResource(R.string.settings_about_desc),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            "Licensed under the GNU General Public License v3.0.",
+                            stringResource(R.string.settings_license),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "Feeds are parsed with ROME; article extraction uses readability4j. Both are Apache-2.0.",
+                            stringResource(R.string.settings_attributions),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -805,3 +807,57 @@ private fun SettingRow(
         trailing()
     }
 }
+
+
+@Composable
+private fun themeModeLabel(mode: ThemeMode): String = stringResource(
+    when (mode) {
+        ThemeMode.SYSTEM -> R.string.mode_system
+        ThemeMode.LIGHT -> R.string.mode_light
+        ThemeMode.DARK -> R.string.mode_dark
+        ThemeMode.SEPIA -> R.string.mode_sepia
+    }
+)
+
+@Composable
+private fun readerFontLabel(font: ReaderFont): String = stringResource(
+    when (font) {
+        ReaderFont.SANS -> R.string.font_sans
+        ReaderFont.SERIF -> R.string.font_serif
+        ReaderFont.OPENDYSLEXIC -> R.string.font_opendyslexic
+        ReaderFont.MONOSPACE -> R.string.font_monospace
+    }
+)
+
+@Composable
+private fun readerAlignLabel(align: ReaderAlign): String = stringResource(
+    when (align) {
+        ReaderAlign.LEFT -> R.string.align_left
+        ReaderAlign.JUSTIFIED -> R.string.align_justified
+        ReaderAlign.CENTER -> R.string.align_center
+    }
+)
+
+@Composable
+private fun retentionLabel(retention: OfflineRetention): String = stringResource(
+    when (retention) {
+        OfflineRetention.WEEK -> R.string.retention_week
+        OfflineRetention.MONTH -> R.string.retention_month
+        OfflineRetention.THREE_MONTHS -> R.string.retention_three_months
+        OfflineRetention.ALWAYS -> R.string.retention_always
+    }
+)
+
+@Composable
+private fun intervalLabel(interval: FeedFetchInterval): String = stringResource(
+    when (interval) {
+        FeedFetchInterval.OFF -> R.string.interval_off
+        FeedFetchInterval.FIFTEEN -> R.string.interval_15
+        FeedFetchInterval.THIRTY -> R.string.interval_30
+        FeedFetchInterval.HOURLY -> R.string.interval_1h
+        FeedFetchInterval.THREE_HOURS -> R.string.interval_3h
+        FeedFetchInterval.SIX_HOURS -> R.string.interval_6h
+        FeedFetchInterval.TWELVE_HOURS -> R.string.interval_12h
+        FeedFetchInterval.DAILY -> R.string.interval_24h
+    }
+)

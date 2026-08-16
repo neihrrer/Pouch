@@ -7,6 +7,7 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import dev.trove.app.R
 import dev.trove.app.data.db.AppDatabase
 import dev.trove.app.data.db.ArticleEntity
 import dev.trove.app.data.db.FeedCategoryEntity
@@ -34,6 +35,7 @@ private val imgRegex = Regex("""img.*?src=(["'])((?!data).*?)\1""", RegexOption.
  *   regex fallback.
  */
 class FeedRepository(
+    private val context: android.content.Context,
     private val db: AppDatabase,
     private val fetcher: WebFetcher,
     private val extractor: ReaderExtractor,
@@ -78,7 +80,7 @@ class FeedRepository(
         // Website URL — discover the feed link, Read You style
         val html = runCatching {
             String(fetcher.fetchRawXml(url).bytes, Charsets.UTF_8)
-        }.getOrElse { throw FetchException.Empty("Unable to detect RSS feed URL") }
+        }.getOrElse { throw FetchException.Empty(context.getString(R.string.err_no_feed_url)) }
         val doc = Jsoup.parse(html, url)
         val links = doc.select("head link[rel~=(?i)alternate][href]")
         val preferred = links.firstOrNull {
@@ -86,10 +88,10 @@ class FeedRepository(
             type == "application/rss+xml" || type == "application/atom+xml" || type == "application/rdf+xml"
         } ?: links.firstOrNull()
         val feedUrl = preferred?.absUrl("href")?.takeIf { it.isNotBlank() }
-            ?: throw FetchException.Empty("Unable to detect RSS feed URL")
+            ?: throw FetchException.Empty(context.getString(R.string.err_no_feed_url))
 
         val feed = parseFeed(fetcher.fetchRawXml(feedUrl))
-            ?: throw FetchException.NotHtml("Not a valid feed")
+            ?: throw FetchException.NotHtml(context.getString(R.string.err_not_a_feed))
         return feed to feedUrl
     }
 
@@ -109,7 +111,7 @@ class FeedRepository(
     suspend fun fetchFeed(feed: FeedEntity): Result<Int> = withContext(Dispatchers.IO) {
         runCatching {
             val synd = parseFeed(fetcher.fetchRawXml(feed.url))
-                ?: throw IOException("Not a valid feed")
+                ?: throw IOException(context.getString(R.string.err_not_a_feed))
             var added = 0
             for (entry in synd.entries) {
                 val link = entry.link?.trim() ?: continue

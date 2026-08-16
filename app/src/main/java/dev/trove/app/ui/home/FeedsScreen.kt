@@ -55,8 +55,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.trove.app.R
 import dev.trove.app.data.db.ArticleWithTags
 import dev.trove.app.data.db.FeedWithCount
 import dev.trove.app.ui.components.AccentChip
@@ -72,14 +74,18 @@ import dev.trove.app.util.timeAgo
 @Composable
 fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Unit) {
     val context = LocalContext.current
+    // Pre-resolved strings for non-composable callbacks
+    val strExported = stringResource(R.string.feeds_exported)
+    val strExportFailed = stringResource(R.string.feeds_export_failed)
+    val strNoFeeds = stringResource(R.string.snack_no_feeds_found)
 
     // Browsing a feed's items (or the combined "All feeds" view)
     if (state.browsingFeedId != null) {
         val feed = state.feeds.firstOrNull { it.feed.id == state.browsingFeedId }
         val allFeeds = state.browsingFeedId == HomeViewModel.ALL_FEEDS
         FeedBrowse(
-            feedTitle = if (allFeeds) "All feeds" else (feed?.feed?.title ?: "Feed"),
-            subtitle = if (allFeeds) "${state.articles.size} items across all feeds" else null,
+            feedTitle = if (allFeeds) stringResource(R.string.feeds_all) else (feed?.feed?.title ?: stringResource(R.string.tab_feeds)),
+            subtitle = if (allFeeds) stringResource(R.string.feeds_items_all, state.articles.size) else null,
             items = state.articles,
             onBack = vm::closeFeed,
             onRefresh = feed?.let { { vm.fetchFeed(it) } } ?: {},
@@ -96,7 +102,7 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
         val text = runCatching {
             context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
         }.getOrNull()
-        if (!text.isNullOrBlank()) vm.importOpml(text)
+        if (!text.isNullOrBlank()) vm.importOpml(text) else SnackbarBus.post(SnackbarBus.Event(strNoFeeds))
     }
 
     val exportLauncher = rememberLauncherForActivityResult(
@@ -106,30 +112,30 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
         val opml = vm.exportOpml()
         runCatching {
             context.contentResolver.openOutputStream(uri)?.writer()?.use { it.write(opml) }
-            SnackbarBus.post(SnackbarBus.Event("Feeds exported as OPML"))
+            SnackbarBus.post(SnackbarBus.Event(strExported))
         }.onFailure {
-            SnackbarBus.post(SnackbarBus.Event("Couldn't export OPML"))
+            SnackbarBus.post(SnackbarBus.Event(strExportFailed))
         }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
         SectionHeader(
-            title = "Feeds",
+            title = stringResource(R.string.tab_feeds),
             count = state.feeds.size,
             large = true,
             modifier = Modifier.padding(top = 16.dp),
             action = {
                 IconButton(onClick = { importLauncher.launch(arrayOf("*/*")) }) {
-                    Icon(Icons.Rounded.FileDownload, contentDescription = "Import OPML")
+                    Icon(Icons.Rounded.FileDownload, contentDescription = stringResource(R.string.feeds_import))
                 }
                 IconButton(onClick = { exportLauncher.launch("trove-feeds.opml") }) {
-                    Icon(Icons.Rounded.FileUpload, contentDescription = "Export OPML")
+                    Icon(Icons.Rounded.FileUpload, contentDescription = stringResource(R.string.feeds_export))
                 }
                 IconButton(onClick = vm::fetchAllFeedsViaWorker) {
-                    Icon(Icons.Rounded.RssFeed, contentDescription = "Refresh all")
+                    Icon(Icons.Rounded.RssFeed, contentDescription = stringResource(R.string.feeds_refresh_all))
                 }
                 IconButton(onClick = vm::showAddFeed) {
-                    Icon(Icons.Rounded.Add, contentDescription = "Add feed")
+                    Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.feeds_add_sheet_title))
                 }
             },
         )
@@ -137,14 +143,14 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
         // Category filter chips — same row component as every other menu
         FilterChipRow(
             chips = listOf(
-                FilterChip("All", state.selectedFeedCategoryId == null) { vm.setFeedCategoryFilter(null) },
+                FilterChip(stringResource(R.string.lib_filter_all), state.selectedFeedCategoryId == null) { vm.setFeedCategoryFilter(null) },
             ) + state.feedCategories.map { category ->
                 FilterChip(
                     label = category.name,
                     selected = state.selectedFeedCategoryId == category.id,
                 ) { vm.setFeedCategoryFilter(category.id) }
             } + listOf(
-                FilterChip("+ Category", false) { vm.showNewCategory() },
+                FilterChip(stringResource(R.string.feeds_category_new), false) { vm.showNewCategory() },
             ),
         )
 
@@ -161,9 +167,9 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
         if (state.feeds.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.RssFeed,
-                title = "No feeds yet",
-                subtitle = "Subscribe to blogs and news sites — new posts flow straight into your Inbox.",
-                actionLabel = "Add a feed",
+                title = stringResource(R.string.feeds_empty_title),
+                subtitle = stringResource(R.string.feeds_empty_subtitle),
+                actionLabel = stringResource(R.string.feeds_add),
                 onAction = vm::showAddFeed,
                 modifier = Modifier.weight(1f),
             )
@@ -195,7 +201,7 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
 
     if (state.showAddFeedSheet) {
         FeedEditSheet(
-            title = "Add feed",
+            title = stringResource(R.string.feeds_add_sheet_title),
             categories = state.feedCategories,
             onSave = { url, categoryId -> vm.addFeed(url, categoryId) },
             onCreateCategory = vm::addCategory,
@@ -204,7 +210,7 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
     }
     state.editingFeed?.let { feed ->
         FeedEditSheet(
-            title = "Edit feed",
+            title = stringResource(R.string.feeds_edit_sheet_title),
             categories = state.feedCategories,
             initialUrl = feed.feed.url,
             initialName = feed.feed.title,
@@ -220,7 +226,7 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
     }
     if (state.showNewCategory) {
         NewEntitySheet(
-            title = "New category",
+            title = stringResource(R.string.common_new_category),
             showColorPicker = false,
             onCreate = { name, _, _ -> vm.addCategory(name) },
             onDismiss = vm::hideNewCategory,
@@ -254,10 +260,10 @@ private fun AllFeedsCard(
             }
             Spacer(Modifier.width(14.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text("All feeds", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.feeds_all), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    "Every item from every subscription",
+                    stringResource(R.string.feeds_all_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -330,9 +336,9 @@ private fun FeedCard(
                 Text(
                     buildString {
                         append(feed.feed.siteUrl?.removePrefix("https://")?.removePrefix("http://") ?: "")
-                        if (feed.articleCount > 0) append(" · ${feed.articleCount} saved")
-                        if (feed.feed.lastFetchedAt > 0) append(" · fetched ${timeAgo(feed.feed.lastFetchedAt)}")
-                        if (feed.feed.fetchFailed) append(" · failed")
+                        if (feed.articleCount > 0) append(" · " + stringResource(R.string.lib_count_saved, feed.articleCount))
+                        if (feed.feed.lastFetchedAt > 0) append(" · " + stringResource(R.string.feeds_fetch_status, timeAgo(feed.feed.lastFetchedAt)))
+                        if (feed.feed.fetchFailed) append(" · " + stringResource(R.string.feeds_failed))
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = if (feed.feed.fetchFailed) MaterialTheme.colorScheme.error
@@ -374,7 +380,7 @@ private fun FeedEditSheet(
             Text(title, style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(4.dp))
             Text(
-                if (isEdit) initialName else "Feed URL — RSS or Atom",
+                if (isEdit) initialName else stringResource(R.string.feeds_url_label),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -384,13 +390,13 @@ private fun FeedEditSheet(
                     value = url,
                     onValueChange = { url = it },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("https://example.com/feed") },
+                    placeholder = { Text(stringResource(R.string.feeds_url_hint)) },
                     leadingIcon = { Icon(Icons.Rounded.Link, contentDescription = null) },
                     trailingIcon = {
                         IconButton(onClick = {
                             clipboard.getText()?.text?.takeIf { it.isNotBlank() }?.let { url = it }
                         }) {
-                            Icon(Icons.Rounded.ContentCopy, contentDescription = "Paste from clipboard")
+                            Icon(Icons.Rounded.ContentCopy, contentDescription = stringResource(R.string.feeds_paste_clipboard))
                         }
                     },
                     shape = RoundedCornerShape(50),
@@ -398,14 +404,14 @@ private fun FeedEditSheet(
                 )
                 Spacer(Modifier.height(16.dp))
             }
-            Text("Category", style = MaterialTheme.typography.labelLarge)
+            Text(stringResource(R.string.feeds_category), style = MaterialTheme.typography.labelLarge)
             Spacer(Modifier.height(8.dp))
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.horizontalScroll(rememberScrollState()),
             ) {
                 AccentChip(
-                    text = "None",
+                    text = stringResource(R.string.common_none),
                     colorIndex = 0,
                     selected = categoryId == null,
                     onClick = { categoryId = null },
@@ -420,7 +426,7 @@ private fun FeedEditSheet(
                 }
                 if (onCreateCategory != null) {
                     AccentChip(
-                        text = "+ Category",
+                        text = stringResource(R.string.feeds_category_new),
                         colorIndex = 5,
                         selected = false,
                         onClick = { showNewCategory = true },
@@ -430,7 +436,7 @@ private fun FeedEditSheet(
             Spacer(Modifier.height(20.dp))
             ExpressiveButton(
                 onClick = { if (url.isNotBlank()) onSave(url.trim(), categoryId) },
-                text = if (isEdit) "Save" else "Add feed",
+                text = if (isEdit) stringResource(R.string.common_save) else stringResource(R.string.feeds_add_sheet_title),
                 icon = Icons.Rounded.Add,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -439,14 +445,14 @@ private fun FeedEditSheet(
                 TextButton(onClick = { onDelete(); onDismiss() }, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Delete, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Delete feed", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.feeds_delete), color = MaterialTheme.colorScheme.error)
                 }
             }
         }
     }
     if (showNewCategory && onCreateCategory != null) {
         NewEntitySheet(
-            title = "New category",
+            title = stringResource(R.string.common_new_category),
             showColorPicker = false,
             onCreate = { name, _, _ ->
                 onCreateCategory(name)
@@ -473,26 +479,26 @@ private fun FeedBrowse(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Rounded.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back))
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(feedTitle, style = MaterialTheme.typography.titleLarge)
                 Text(
-                    subtitle ?: "${items.size} items · tap to read, add the ones you want",
+                    subtitle ?: stringResource(R.string.feeds_items_hint, items.size),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             IconButton(onClick = onRefresh) {
-                Icon(Icons.Rounded.RssFeed, contentDescription = "Refresh feed")
+                Icon(Icons.Rounded.RssFeed, contentDescription = stringResource(R.string.feeds_refresh))
             }
         }
         if (items.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.RssFeed,
-                title = "No items yet",
-                subtitle = "Refresh this feed to pull in the latest posts.",
-                actionLabel = "Refresh feed",
+                title = stringResource(R.string.feeds_no_items_title),
+                subtitle = stringResource(R.string.feeds_no_items_subtitle),
+                actionLabel = stringResource(R.string.feeds_refresh),
                 onAction = onRefresh,
                 modifier = Modifier.weight(1f),
             )
@@ -561,13 +567,13 @@ private fun FeedItemCard(
                     ) {
                         Icon(
                             Icons.Rounded.Check,
-                            contentDescription = "In Library",
+                            contentDescription = stringResource(R.string.feeds_in_library),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.size(16.dp),
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
-                            "Saved",
+                            stringResource(R.string.feeds_saved),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                         )
@@ -591,7 +597,7 @@ private fun FeedItemCard(
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
-                            "Add",
+                            stringResource(R.string.feeds_add_label),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onPrimary,
                         )

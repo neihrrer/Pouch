@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -54,6 +55,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import dev.trove.app.R
 import dev.trove.app.data.db.ArticleEntity
 import dev.trove.app.ui.components.rememberMissingImagePainter
 import dev.trove.app.ui.theme.ExpressiveSprings
@@ -563,7 +565,7 @@ private fun HighlightBar(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Text(
-                "Highlight",
+                stringResource(R.string.reader_highlight),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -620,7 +622,7 @@ fun ArticleHeader(
             article.siteName,
             article.byline,
             article.publishedAt?.let { dev.trove.app.util.fullDate(it) },
-            article.contentText?.let { "${it.split(" ").size} words" },
+            article.contentText?.let { stringResource(R.string.reader_words, it.split(" ").size) },
         ).joinToString(" · ")
         if (meta.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))

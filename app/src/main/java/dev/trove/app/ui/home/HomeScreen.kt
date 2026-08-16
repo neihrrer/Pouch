@@ -37,6 +37,9 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Sort
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Bookmark
+import androidx.compose.material.icons.rounded.BookmarkBorder
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.CollectionsBookmark
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.DropdownMenu
@@ -67,6 +70,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -78,6 +82,7 @@ import dev.trove.app.data.db.TagWithCount
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import dev.trove.app.BuildConfig
+import dev.trove.app.R
 import dev.trove.app.ui.components.AccentChip
 import dev.trove.app.ui.components.ArticleCard
 import dev.trove.app.ui.components.EmptyState
@@ -194,7 +199,7 @@ fun HomeScreen(
                         selected = state.tab == 0,
                         onClick = { vm.selectTab(0) },
                         icon = { Icon(Icons.Rounded.RssFeed, contentDescription = null) },
-                        label = { Text("Feeds") },
+                        label = { Text(stringResource(R.string.tab_feeds)) },
                         colors = NavigationBarItemDefaults.colors(
                             indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
                         ),
@@ -203,7 +208,7 @@ fun HomeScreen(
                         selected = state.tab == 1,
                         onClick = { vm.selectTab(1) },
                         icon = { Icon(Icons.Rounded.CollectionsBookmark, contentDescription = null) },
-                        label = { Text("Library") },
+                        label = { Text(stringResource(R.string.tab_library)) },
                         colors = NavigationBarItemDefaults.colors(
                             indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
                         ),
@@ -212,7 +217,7 @@ fun HomeScreen(
                         selected = state.tab == 2,
                         onClick = { vm.selectTab(2) },
                         icon = { Icon(Icons.Rounded.Folder, contentDescription = null) },
-                        label = { Text("Folders") },
+                        label = { Text(stringResource(R.string.tab_folders)) },
                         colors = NavigationBarItemDefaults.colors(
                             indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
                         ),
@@ -221,7 +226,7 @@ fun HomeScreen(
                         selected = state.tab == 3,
                         onClick = { vm.selectTab(3) },
                         icon = { Icon(Icons.Rounded.Sell, contentDescription = null) },
-                        label = { Text("Tags") },
+                        label = { Text(stringResource(R.string.tab_tags)) },
                         colors = NavigationBarItemDefaults.colors(
                             indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
                         ),
@@ -239,7 +244,7 @@ fun HomeScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
-                    Icon(Icons.Rounded.Add, contentDescription = "Add link")
+                    Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.lib_add_link))
                 }
             }
         },
@@ -258,8 +263,8 @@ fun HomeScreen(
                     val folder = state.folders.firstOrNull { it.folder.id == state.browsingFolderId }
                     val subfolders = state.folders.filter { it.folder.parentId == state.browsingFolderId }
                     BrowseList(
-                        title = folder?.folder?.name ?: "Folder",
-                        subtitle = "${state.articles.size} saved",
+                        title = folder?.folder?.name ?: stringResource(R.string.tab_folders),
+                        subtitle = stringResource(R.string.lib_count_saved, state.articles.size),
                         articles = state.articles,
                         onBack = vm::closeBrowsing,
                         onOpenArticle = { onOpenArticle(it.article.id) },
@@ -275,7 +280,7 @@ fun HomeScreen(
                     val tag = state.tags.firstOrNull { it.tag.id == state.browsingTagId }
                     BrowseList(
                         title = "#${tag?.tag?.name ?: "Tag"}",
-                        subtitle = "${state.articles.size} saved",
+                        subtitle = stringResource(R.string.lib_count_saved, state.articles.size),
                         articles = state.articles,
                         onBack = vm::closeBrowsing,
                         onOpenArticle = { onOpenArticle(it.article.id) },
@@ -335,7 +340,7 @@ fun HomeScreen(
 
     if (state.newFolderVisible) {
         NewEntitySheet(
-            title = "New folder",
+            title = stringResource(R.string.folders_new),
             onCreate = { name, color, parentId ->
                 val article = state.actionsArticle
                 if (article != null) vm.createFolderAndApply(article.article.id, name, color)
@@ -348,7 +353,7 @@ fun HomeScreen(
     }
     if (state.newTagVisible) {
         NewEntitySheet(
-            title = "New tag",
+            title = stringResource(R.string.tags_new),
             onCreate = { name, color, _ ->
                 val article = state.actionsArticle
                 if (article != null) vm.createTagAndApply(article.article.id, name, color)
@@ -359,7 +364,7 @@ fun HomeScreen(
     }
     state.editingFolder?.let { folder ->
         NewEntitySheet(
-            title = "Edit folder",
+            title = stringResource(R.string.folders_edit),
             initialName = folder.folder.name,
             initialColorIndex = folder.folder.colorIndex,
             initialParentId = folder.folder.parentId,
@@ -375,7 +380,7 @@ fun HomeScreen(
     }
     state.editingTag?.let { tag ->
         NewEntitySheet(
-            title = "Edit tag",
+            title = stringResource(R.string.tags_edit),
             initialName = tag.tag.name,
             initialColorIndex = tag.tag.colorIndex,
             isEdit = true,
@@ -418,18 +423,18 @@ private fun InboxTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long
     Column(modifier = Modifier.fillMaxSize()) {
         // Header — same style as Folders/Tags, with search + settings actions
         SectionHeader(
-            title = "Library",
+            title = stringResource(R.string.tab_library),
             count = state.articles.size,
             large = true,
             modifier = Modifier.padding(top = 16.dp),
             action = {
                 var sortMenu by remember { mutableStateOf(false) }
                 IconButton(onClick = { vm.setSearchActive(true) }) {
-                    Icon(Icons.Rounded.Search, contentDescription = "Search")
+                    Icon(Icons.Rounded.Search, contentDescription = stringResource(R.string.common_search))
                 }
                 Box {
                     IconButton(onClick = { sortMenu = true }) {
-                        Icon(Icons.Rounded.Sort, contentDescription = "Sort")
+                        Icon(Icons.Rounded.Sort, contentDescription = stringResource(R.string.lib_sort))
                     }
                     DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
                         SortOrder.entries.forEach { order ->
@@ -437,9 +442,9 @@ private fun InboxTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long
                                 text = {
                                     Text(
                                         when (order) {
-                                            SortOrder.NEWEST -> "Newest first"
-                                            SortOrder.OLDEST -> "Oldest first"
-                                            SortOrder.READING_TIME -> "Longest reads"
+                                            SortOrder.NEWEST -> stringResource(R.string.lib_sort_newest)
+                                            SortOrder.OLDEST -> stringResource(R.string.lib_sort_oldest)
+                                            SortOrder.READING_TIME -> stringResource(R.string.lib_sort_longest)
                                         }
                                     )
                                 },
@@ -457,7 +462,7 @@ private fun InboxTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long
                     }
                 }
                 IconButton(onClick = vm::showSettings) {
-                    Icon(Icons.Rounded.Settings, contentDescription = "Settings")
+                    Icon(Icons.Rounded.Settings, contentDescription = stringResource(R.string.common_settings))
                 }
             },
         )
@@ -470,28 +475,28 @@ private fun InboxTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long
         ) {
             item {
                 FilterChipPill(
-                    label = "All",
+                    label = stringResource(R.string.lib_filter_all),
                     selected = state.filter == ArticleFilter.ALL,
                     onClick = { vm.setFilter(ArticleFilter.ALL) },
                 )
             }
             item {
                 FilterChipPill(
-                    label = "Unread",
+                    label = stringResource(R.string.lib_filter_unread),
                     selected = state.filter == ArticleFilter.UNREAD,
                     onClick = { vm.setFilter(ArticleFilter.UNREAD) },
                 )
             }
             item {
                 FilterChipPill(
-                    label = "Done",
+                    label = stringResource(R.string.lib_filter_done),
                     selected = state.filter == ArticleFilter.DONE,
                     onClick = { vm.setFilter(ArticleFilter.DONE) },
                 )
             }
             item {
                 FilterChipPill(
-                    label = "Favorites",
+                    label = stringResource(R.string.lib_filter_favorites),
                     selected = state.filter == ArticleFilter.FAVORITES,
                     onClick = { vm.setFilter(ArticleFilter.FAVORITES) },
                 )
@@ -504,18 +509,18 @@ private fun InboxTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long
             EmptyState(
                 icon = Icons.Rounded.CollectionsBookmark,
                 title = when (state.filter) {
-                    ArticleFilter.ALL -> "Nothing saved yet"
-                    ArticleFilter.UNREAD -> "No unread articles"
-                    ArticleFilter.FAVORITES -> "No favorites yet"
-                    ArticleFilter.DONE -> "No finished articles"
+                    ArticleFilter.ALL -> stringResource(R.string.lib_empty_all_title)
+                    ArticleFilter.UNREAD -> stringResource(R.string.lib_empty_unread_title)
+                    ArticleFilter.FAVORITES -> stringResource(R.string.lib_empty_fav_title)
+                    ArticleFilter.DONE -> stringResource(R.string.lib_empty_done_title)
                 },
                 subtitle = when (state.filter) {
-                    ArticleFilter.ALL -> "Share an article to Pouch or tap + to save your first link."
-                    ArticleFilter.UNREAD -> "Articles you haven't finished reading will appear here."
-                    ArticleFilter.FAVORITES -> "Bookmark an article to find it here quickly."
-                    ArticleFilter.DONE -> "Articles you've finished reading will appear here."
+                    ArticleFilter.ALL -> stringResource(R.string.lib_empty_all_subtitle)
+                    ArticleFilter.UNREAD -> stringResource(R.string.lib_empty_unread_subtitle)
+                    ArticleFilter.FAVORITES -> stringResource(R.string.lib_empty_fav_subtitle)
+                    ArticleFilter.DONE -> stringResource(R.string.lib_empty_done_subtitle)
                 },
-                actionLabel = if (state.filter == ArticleFilter.ALL) "Save a link" else null,
+                actionLabel = if (state.filter == ArticleFilter.ALL) stringResource(R.string.lib_save_link) else null,
                 onAction = if (state.filter == ArticleFilter.ALL) ({ vm.showAddSheet() }) else null,
                 modifier = Modifier.weight(1f),
             )
@@ -637,7 +642,7 @@ private fun BrowseList(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Rounded.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back))
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(title, style = MaterialTheme.typography.titleLarge)
@@ -649,7 +654,7 @@ private fun BrowseList(
             }
             if (onEdit != null) {
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Rounded.Edit, contentDescription = "Edit")
+                    Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.common_edit))
                 }
             }
         }
@@ -673,8 +678,8 @@ private fun BrowseList(
         if (articles.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.Folder,
-                title = "Nothing here",
-                subtitle = "Articles you move here will show up in this folder.",
+                title = stringResource(R.string.lib_browse_empty_title),
+                subtitle = stringResource(R.string.lib_browse_empty_subtitle),
                 modifier = Modifier.weight(1f),
             )
         } else {
@@ -702,22 +707,22 @@ private fun FoldersTab(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         SectionHeader(
-            title = "Folders",
+            title = stringResource(R.string.tab_folders),
             count = state.folders.size,
             large = true,
             modifier = Modifier.padding(top = 16.dp),
             action = {
                 IconButton(onClick = vm::showNewFolder) {
-                    Icon(Icons.Rounded.Add, contentDescription = "New folder")
+                    Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.folders_new))
                 }
             },
         )
         if (state.folders.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.Folder,
-                title = "No folders yet",
-                subtitle = "Organize your reading into folders — work, inspiration, deep dives.",
-                actionLabel = "Create folder",
+                title = stringResource(R.string.folders_empty_title),
+                subtitle = stringResource(R.string.folders_empty_subtitle),
+                actionLabel = stringResource(R.string.folders_create),
                 onAction = vm::showNewFolder,
                 modifier = Modifier.weight(1f),
             )
@@ -766,7 +771,7 @@ private fun FolderCard(folder: FolderWithCount, onClick: () -> Unit, onLongClick
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                "${folder.articleCount} saved",
+                stringResource(R.string.lib_count_saved, folder.articleCount),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -786,22 +791,22 @@ private fun TagsTab(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         SectionHeader(
-            title = "Tags",
+            title = stringResource(R.string.tab_tags),
             count = state.tags.size,
             large = true,
             modifier = Modifier.padding(top = 16.dp),
             action = {
                 IconButton(onClick = vm::showNewTag) {
-                    Icon(Icons.Rounded.Add, contentDescription = "New tag")
+                    Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.tags_new))
                 }
             },
         )
         if (state.tags.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.Sell,
-                title = "No tags yet",
-                subtitle = "Tag articles as you save them — tech, design, recipes, anything.",
-                actionLabel = "Create tag",
+                title = stringResource(R.string.tags_empty_title),
+                subtitle = stringResource(R.string.tags_empty_subtitle),
+                actionLabel = stringResource(R.string.tags_create),
                 onAction = vm::showNewTag,
                 modifier = Modifier.weight(1f),
             )
@@ -849,7 +854,7 @@ private fun SearchOverlay(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onClose) {
-                Icon(Icons.Rounded.Close, contentDescription = "Close search")
+                Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.common_back))
             }
             androidx.compose.foundation.text.BasicTextField(
                 value = query,
@@ -863,7 +868,7 @@ private fun SearchOverlay(
                     Box {
                         if (query.isEmpty()) {
                             Text(
-                                "Search titles & content",
+                                stringResource(R.string.lib_search_hint),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -878,15 +883,15 @@ private fun SearchOverlay(
         if (query.length < 2) {
             EmptyState(
                 icon = Icons.Rounded.Search,
-                title = "Search your library",
-                subtitle = "Type at least two characters — we search titles and full text.",
+                title = stringResource(R.string.lib_search_empty_title),
+                subtitle = stringResource(R.string.lib_search_empty_subtitle),
                 modifier = Modifier.weight(1f),
             )
         } else if (results.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.Search,
-                title = "No matches",
-                subtitle = "Nothing found for “$query”.",
+                title = stringResource(R.string.lib_no_matches),
+                subtitle = stringResource(R.string.lib_no_matches_for, query),
                 modifier = Modifier.weight(1f),
             )
         } else {

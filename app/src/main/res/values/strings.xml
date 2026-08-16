@@ -2,10 +2,259 @@
 <resources>
     <string name="app_name">Pouch</string>
     <string name="tagline">Keep your reading in a pouch</string>
+
+    <!-- Shortcuts -->
     <string name="shortcut_save_link">Save link</string>
     <string name="shortcut_save_link_long">Save a link</string>
     <string name="shortcut_random">Random article</string>
     <string name="shortcut_random_long">Open a random article</string>
     <string name="shortcut_feeds">Fetch feeds</string>
     <string name="shortcut_feeds_long">Refresh all feeds</string>
+
+    <!-- Common -->
+    <string name="common_back">Back</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_save">Save</string>
+    <string name="common_create">Create</string>
+    <string name="common_save_changes">Save changes</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_search">Search</string>
+    <string name="common_settings">Settings</string>
+    <string name="common_undo">Undo</string>
+    <string name="common_more">More</string>
+    <string name="common_name">Name</string>
+    <string name="common_color">Color</string>
+    <string name="common_none">None</string>
+    <string name="common_inside">Inside</string>
+    <string name="common_top_level">Top level</string>
+    <string name="common_paste">Paste</string>
+    <string name="common_new_category">New category</string>
+    <string name="common_open_in_new">Open in new</string>
+
+    <!-- Tabs -->
+    <string name="tab_feeds">Feeds</string>
+    <string name="tab_library">Library</string>
+    <string name="tab_folders">Folders</string>
+    <string name="tab_tags">Tags</string>
+
+    <!-- Library -->
+    <string name="lib_filter_all">All</string>
+    <string name="lib_filter_unread">Unread</string>
+    <string name="lib_filter_done">Done</string>
+    <string name="lib_filter_favorites">Favorites</string>
+    <string name="lib_sort">Sort</string>
+    <string name="lib_sort_newest">Newest first</string>
+    <string name="lib_sort_oldest">Oldest first</string>
+    <string name="lib_sort_longest">Longest reads</string>
+    <string name="lib_add_link">Add link</string>
+    <string name="lib_save_link">Save a link</string>
+    <string name="lib_search_hint">Search titles &amp; content</string>
+    <string name="lib_search_empty_title">Search your library</string>
+    <string name="lib_search_empty_subtitle">Type at least two characters — we search titles and full text.</string>
+    <string name="lib_no_matches">No matches</string>
+    <string name="lib_no_matches_for">Nothing found for “%1$s”.</string>
+    <string name="lib_empty_all_title">Nothing saved yet</string>
+    <string name="lib_empty_all_subtitle">Share an article to Pouch or tap + to save your first link.</string>
+    <string name="lib_empty_unread_title">No unread articles</string>
+    <string name="lib_empty_unread_subtitle">Articles you haven\'t finished reading will appear here.</string>
+    <string name="lib_empty_done_title">No finished articles</string>
+    <string name="lib_empty_done_subtitle">Articles you\'ve finished reading will appear here.</string>
+    <string name="lib_empty_fav_title">No favorites yet</string>
+    <string name="lib_empty_fav_subtitle">Bookmark an article to find it here quickly.</string>
+    <string name="lib_browse_empty_title">Nothing here</string>
+    <string name="lib_browse_empty_subtitle">Articles you move here will show up in this folder.</string>
+    <string name="lib_count_saved">%1$d saved</string>
+    <string name="lib_min_read">%1$d min read</string>
+    <string name="lib_offline_badge">Offline copy saved</string>
+    <string name="lib_swipe_favorite">Favorite</string>
+    <string name="lib_swipe_unfavorite">Unfavorite</string>
+    <string name="lib_swipe_delete">Delete</string>
+
+    <!-- Folders & tags -->
+    <string name="folders_title">Folders</string>
+    <string name="folders_empty_title">No folders yet</string>
+    <string name="folders_empty_subtitle">Organize your reading into folders — work, inspiration, deep dives.</string>
+    <string name="folders_create">Create folder</string>
+    <string name="folders_new">New folder</string>
+    <string name="folders_edit">Edit folder</string>
+    <string name="tags_title">Tags</string>
+    <string name="tags_empty_title">No tags yet</string>
+    <string name="tags_empty_subtitle">Tag articles as you save them — tech, design, recipes, anything.</string>
+    <string name="tags_create">Create tag</string>
+    <string name="tags_new">New tag</string>
+    <string name="tags_edit">Edit tag</string>
+
+    <!-- Feeds -->
+    <string name="feeds_all">All feeds</string>
+    <string name="feeds_all_subtitle">Every item from every subscription</string>
+    <string name="feeds_import">Import OPML</string>
+    <string name="feeds_export">Export OPML</string>
+    <string name="feeds_refresh_all">Refresh all</string>
+    <string name="feeds_add">Add a feed</string>
+    <string name="feeds_empty_title">No feeds yet</string>
+    <string name="feeds_empty_subtitle">Subscribe to blogs and news sites — new posts flow straight into your Library.</string>
+    <string name="feeds_add_sheet_title">Add feed</string>
+    <string name="feeds_edit_sheet_title">Edit feed</string>
+    <string name="feeds_url_hint">https://example.com/feed</string>
+    <string name="feeds_url_label">Feed URL — RSS or Atom</string>
+    <string name="feeds_category">Category</string>
+    <string name="feeds_category_new">+ Category</string>
+    <string name="feeds_paste_clipboard">Paste from clipboard</string>
+    <string name="feeds_delete">Delete feed</string>
+    <string name="feeds_no_items_title">No items yet</string>
+    <string name="feeds_no_items_subtitle">Refresh this feed to pull in the latest posts.</string>
+    <string name="feeds_refresh">Refresh feed</string>
+    <string name="feeds_items_hint">%1$d items · tap to read, add the ones you want</string>
+    <string name="feeds_items_all">%1$d items across all feeds</string>
+    <string name="feeds_in_library">In Library</string>
+    <string name="feeds_saved">Saved</string>
+    <string name="feeds_add_label">Add</string>
+    <string name="feeds_fetch_status">fetched %1$s</string>
+    <string name="feeds_failed">failed</string>
+    <string name="feeds_exported">Feeds exported as OPML</string>
+    <string name="feeds_export_failed">Couldn\'t export OPML</string>
+
+    <!-- Reader -->
+    <string name="reader_smaller_text">Smaller text</string>
+    <string name="reader_larger_text">Larger text</string>
+    <string name="reader_reader_settings">Reader settings</string>
+    <string name="reader_no_content_title">This article has no saved content yet.</string>
+    <string name="reader_fetch_content">Fetch content</string>
+    <string name="reader_refreshing">Refreshing…</string>
+    <string name="reader_end">You\'ve reached the end</string>
+    <string name="reader_highlight">Highlight</string>
+    <string name="reader_highlights">Highlights</string>
+    <string name="reader_highlights_count">Highlights (%1$d)</string>
+    <string name="reader_no_highlights_title">No highlights yet</string>
+    <string name="reader_no_highlights_subtitle">Select text in the article, then pick a color from the bar.</string>
+    <string name="reader_nothing_highlighted">Nothing highlighted</string>
+    <string name="reader_highlight_hint">Long-press and drag across text to select it, then choose a color.</string>
+    <string name="reader_remove_highlight">Remove highlight</string>
+    <string name="reader_words">%1$d words</string>
+    <string name="reader_share_link">Share link</string>
+
+    <!-- Sheets -->
+    <string name="sheet_save_link_title">Save a link</string>
+    <string name="sheet_save_link_subtitle">We\'ll fetch the page and save it in reader mode</string>
+    <string name="sheet_url_hint">https://example.com/article</string>
+    <string name="sheet_save_article">Save article</string>
+    <string name="sheet_fetching">Fetching…</string>
+    <string name="sheet_no_folder">No folder</string>
+    <string name="sheet_add_to_library">Add to Library</string>
+    <string name="sheet_add_to_favorites">Add to favorites</string>
+    <string name="sheet_remove_favorite">Remove favorite</string>
+    <string name="sheet_mark_read">Mark as read</string>
+    <string name="sheet_mark_unread">Mark as unread</string>
+    <string name="sheet_refresh_content">Refresh content</string>
+    <string name="sheet_download_offline">Download for offline</string>
+    <string name="sheet_offline_saved">Offline copy saved</string>
+    <string name="sheet_open_browser">Open in browser</string>
+    <string name="sheet_delete_article">Delete article</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_appearance_subtitle">Theme, colors, OLED</string>
+    <string name="settings_reading">Reading</string>
+    <string name="settings_reading_subtitle">Font, alignment, spacing</string>
+    <string name="settings_reading_hint">These only apply in reader mode</string>
+    <string name="settings_feeds">Feeds</string>
+    <string name="settings_feeds_subtitle">Refresh, retention, sync</string>
+    <string name="settings_data">Data</string>
+    <string name="settings_data_subtitle">Backup &amp; restore your library</string>
+    <string name="settings_about">About</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_dynamic_color">Dynamic color</string>
+    <string name="settings_dynamic_color_subtitle">Match the system wallpaper palette</string>
+    <string name="settings_oled">True OLED</string>
+    <string name="settings_oled_subtitle">Pure black backgrounds in dark mode</string>
+    <string name="settings_typeface">Typeface</string>
+    <string name="settings_alignment">Alignment</string>
+    <string name="settings_text_size">Text size</string>
+    <string name="settings_line_spacing">Line spacing</string>
+    <string name="settings_letter_spacing">Letter spacing</string>
+    <string name="settings_word_spacing">Word spacing</string>
+    <string name="settings_feed_interval">Refresh frequency</string>
+    <string name="settings_feed_retention">Keep feed items for</string>
+    <string name="settings_sync_on_start">Sync on start</string>
+    <string name="settings_sync_on_start_subtitle">Refresh feeds when the app opens</string>
+    <string name="settings_wifi_only">Wi-Fi only</string>
+    <string name="settings_wifi_only_subtitle">Background sync only on unmetered networks</string>
+    <string name="settings_charging_only">While charging only</string>
+    <string name="settings_charging_only_subtitle">Background sync only when plugged in</string>
+    <string name="settings_export_data">Export all data</string>
+    <string name="settings_import_data">Import all data</string>
+    <string name="settings_backup_hint">Backups include saved articles, folders, tags, highlights and feed subscriptions as a JSON file.</string>
+    <string name="settings_about_desc">A read-later app with an RSS reader, folders, tags and offline reading.</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="settings_license">Licensed under the GNU General Public License v3.0.</string>
+    <string name="settings_attributions">Feeds are parsed with ROME; article extraction uses readability4j. Both are Apache-2.0.</string>
+
+    <!-- Theme modes -->
+    <string name="mode_system">System</string>
+    <string name="mode_light">Light</string>
+    <string name="mode_dark">Dark</string>
+    <string name="mode_sepia">Sepia</string>
+    <string name="font_sans">Sans</string>
+    <string name="font_serif">Serif</string>
+    <string name="font_opendyslexic">OpenDyslexic</string>
+    <string name="font_monospace">Mono</string>
+    <string name="align_left">Left</string>
+    <string name="align_justified">Justified</string>
+    <string name="align_center">Center</string>
+    <string name="retention_week">1 week</string>
+    <string name="retention_month">1 month</string>
+    <string name="retention_three_months">3 months</string>
+    <string name="retention_always">Always</string>
+    <string name="interval_off">Off</string>
+    <string name="interval_15">15 min</string>
+    <string name="interval_30">30 min</string>
+    <string name="interval_1h">1 hour</string>
+    <string name="interval_3h">3 hours</string>
+    <string name="interval_6h">6 hours</string>
+    <string name="interval_12h">12 hours</string>
+    <string name="interval_24h">24 hours</string>
+
+    <!-- Snackbars -->
+    <string name="snack_article_deleted">Article deleted</string>
+    <string name="snack_added_library">Added to Library</string>
+    <string name="snack_already_library">Already in your library</string>
+    <string name="snack_highlight_added">Highlight added</string>
+    <string name="snack_offline_saved">Saved for offline reading (%1$d images)</string>
+    <string name="snack_offline_text_only">Article text is already stored offline</string>
+    <string name="snack_offline_failed">Couldn\'t download images</string>
+    <string name="snack_offline_downloading">Downloading articles for offline…</string>
+    <string name="snack_offline_done">Offline downloads complete (%1$d of %2$d articles)</string>
+    <string name="snack_offline_expired">Expired %1$d offline copies</string>
+    <string name="snack_feed_items_expired">Expired %1$d old feed items</string>
+    <string name="snack_feed_removed">Feed removed</string>
+    <string name="snack_folder_deleted">Folder deleted</string>
+    <string name="snack_tag_deleted">Tag deleted</string>
+    <string name="snack_category_deleted">Category deleted</string>
+    <string name="snack_subscribed">Subscribed to %1$s</string>
+    <string name="snack_imported_feeds">Imported %1$d feeds</string>
+    <string name="snack_imported_articles">Imported %1$d articles</string>
+    <string name="snack_imported_new">Imported %1$d new articles</string>
+    <string name="snack_no_feeds_found">No feeds found in the file</string>
+    <string name="snack_feeds_up_to_date">All feeds up to date</string>
+    <string name="snack_no_new_articles">No new articles in %1$s</string>
+    <string name="snack_refreshing_feeds">Refreshing feeds…</string>
+    <string name="snack_couldnt_add_feed">Couldn\'t add feed: %1$s</string>
+    <string name="snack_refresh_failed">Couldn\'t refresh: %1$s</string>
+    <string name="snack_backup_exported">Backup exported</string>
+    <string name="snack_backup_export_failed">Couldn\'t export backup</string>
+    <string name="snack_backup_import_failed">Couldn\'t read backup file</string>
+    <string name="snack_backup_choose_save">Choose where to save the backup</string>
+    <string name="snack_backup_choose_import">Choose a backup file to import</string>
+    <string name="snack_backup_summary">Imported %1$d articles, %2$d folders, %3$d tags</string>
+
+    <!-- Errors -->
+    <string name="err_invalid_link">That doesn\'t look like a valid link</string>
+    <string name="err_fetch">Couldn\'t fetch this page</string>
+    <string name="err_generic">Something went wrong: %1$s</string>
+    <string name="err_blocked">This site blocked automated access (%1$d). Try opening it in a browser instead.</string>
+    <string name="err_not_found">This link doesn\'t exist (404).</string>
+    <string name="err_rate_limited">This site is rate-limiting requests right now (429). Try again later.</string>
+    <string name="err_not_a_feed">Not a valid feed</string>
+    <string name="err_no_feed_url">Unable to detect RSS feed URL</string>
 </resources>

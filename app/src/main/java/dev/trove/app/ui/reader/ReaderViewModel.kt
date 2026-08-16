@@ -9,6 +9,7 @@ import dev.trove.app.data.ReaderFont
 import dev.trove.app.data.ReaderSettings
 import dev.trove.app.data.SettingsRepository
 import dev.trove.app.data.ThemeMode
+import dev.trove.app.R
 import dev.trove.app.data.db.ArticleWithTags
 import dev.trove.app.data.db.FolderEntity
 import dev.trove.app.data.db.HighlightEntity
@@ -40,6 +41,7 @@ data class ReaderUiState(
 )
 
 class ReaderViewModel(
+    private val appContext: android.content.Context,
     private val repo: ArticleRepository,
     private val settingsRepo: SettingsRepository,
     articleId: Long,
@@ -149,7 +151,10 @@ class ReaderViewModel(
             hideActionsSheet()
             val tagIds = article.tags.map { it.id }
             SnackbarBus.post(
-                SnackbarBus.Event("Article deleted", "Undo") {
+                SnackbarBus.Event(
+                    appContext.getString(R.string.snack_article_deleted),
+                    appContext.getString(R.string.common_undo)
+                ) {
                     viewModelScope.launch { repo.restoreArticle(article.article, tagIds) }
                 }
             )
@@ -166,7 +171,7 @@ class ReaderViewModel(
     ) {
         viewModelScope.launch {
             repo.addHighlight(articleId, text.trim(), colorIndex, blockIndex, startOffset, endOffset)
-            SnackbarBus.post(SnackbarBus.Event("Highlight added"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_highlight_added)))
         }
     }
 
@@ -177,7 +182,7 @@ class ReaderViewModel(
     fun saveToLibrary(article: ArticleWithTags) {
         viewModelScope.launch {
             repo.saveFeedItem(article.article.id)
-            SnackbarBus.post(SnackbarBus.Event("Added to Library"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_added_library)))
             hideActionsSheet()
         }
     }
@@ -186,8 +191,11 @@ class ReaderViewModel(
         viewModelScope.launch {
             val result = repo.downloadForOffline(article.article)
             val msg = result.fold(
-                onSuccess = { n -> if (n > 0) "Saved for offline reading ($n images)" else "Article text is already stored offline" },
-                onFailure = { "Couldn't download images" },
+                onSuccess = { n ->
+                    if (n > 0) appContext.getString(R.string.snack_offline_saved, n)
+                    else appContext.getString(R.string.snack_offline_text_only)
+                },
+                onFailure = { appContext.getString(R.string.snack_offline_failed) },
             )
             SnackbarBus.post(SnackbarBus.Event(msg))
         }
@@ -195,7 +203,7 @@ class ReaderViewModel(
 
     fun downloadAllOffline() {
         viewModelScope.launch {
-            SnackbarBus.post(SnackbarBus.Event("Downloading articles for offline…"))
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_offline_downloading)))
             val all = repo.getAllArticles()
             var done = 0
             all.forEach { article ->
@@ -218,7 +226,7 @@ class ReaderViewModel(
             if (retention != OfflineRetention.ALWAYS) {
                 val removed = repo.cleanupOfflineDownloads(retention)
                 if (removed > 0) {
-                    SnackbarBus.post(SnackbarBus.Event("Expired $removed offline copies"))
+                    SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_offline_expired, "$removed")))
                 }
             }
         }
