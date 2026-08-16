@@ -27,10 +27,6 @@ Save articles and read them in a clean reader mode, organize them with folders (
 | --- | --- | --- |
 | ![Feeds](screenshots/feeds_dark.png) | ![Feeds dark](screenshots/feeds2_dark.png) | ![Folders](screenshots/folders_light.png) |
 
-| Tags (dark) |
-| --- |
-| ![Tags](screenshots/tags_dark.png) |
-
 ## Building
 
 ```bash
