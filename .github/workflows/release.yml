@@ -2,7 +2,8 @@ name: Release
 
 on:
   push:
-    tags: ["v*"]
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
@@ -21,18 +22,22 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
-      - name: Set up release signing (optional)
-        if: env.KEYSTORE_BASE64 != ''
+      - name: Set up release signing
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > keystore.jks
-          cat > keystore.properties <<EOF
-          storeFile=keystore.jks
-          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyAlias=${{ secrets.KEY_ALIAS }}
-          keyPassword=${{ secrets.KEY_PASSWORD }}
-          EOF
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > keystore.jks
+            cat > keystore.properties <<EOF
+            storeFile=keystore.jks
+            storePassword=$KEYSTORE_PASSWORD
+            keyAlias=$KEY_ALIAS
+            keyPassword=$KEY_PASSWORD
+            EOF
+          fi
 
       - name: Build release APK
         run: ./gradlew :app:assembleRelease --no-daemon
@@ -40,8 +45,9 @@ jobs:
       - name: Resolve version
         id: ver
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+          if [ "${{ github.ref_type }}" = "tag" ]; then
             echo "tag=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            echo "ref=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
           else
             V=$(./gradlew :app:printVersionName -q --no-daemon | grep VERSION_NAME | cut -d= -f2)
             echo "tag=$V" >> "$GITHUB_OUTPUT"
@@ -58,9 +64,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="${{ steps.ver.outputs.ref }}"
-          if [[ -z "$TAG" ]]; then TAG="${{ github.ref_name }}"; fi
-          gh release create "$TAG" app/build/outputs/apk/release/app-release.apk \
+          gh release create "${{ steps.ver.outputs.ref }}" app/build/outputs/apk/release/app-release.apk \
             --title "Pouch ${{ steps.ver.outputs.tag }}" \
             --notes "Download **Pouch ${{ steps.ver.outputs.tag }}** and install the APK directly on your device.
 
