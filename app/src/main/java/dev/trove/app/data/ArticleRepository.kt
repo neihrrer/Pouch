@@ -271,6 +271,9 @@ class ArticleRepository(
 
     suspend fun getArticle(id: Long): ArticleEntity? = articles.getById(id)
 
+    /** A random saved article id (app shortcut). */
+    suspend fun getRandomArticleId(): Long? = articles.getRandomSavedId()
+
     /** Library articles, for bulk offline downloads (feed items excluded). */
     suspend fun getAllArticles(): List<ArticleEntity> = articles.getAllSaved()
 

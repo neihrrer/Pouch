@@ -140,6 +140,23 @@ fun HomeScreen(
         vm.openArticleEvents.collect { onOpenArticle(it) }
     }
 
+    // App shortcuts
+    val app = context.applicationContext as dev.trove.app.TroveApplication
+    LaunchedEffect(Unit) {
+        app.pendingAddLink.collect { if (it) { vm.showAddSheet(); app.pendingAddLink.value = false } }
+    }
+    LaunchedEffect(Unit) {
+        app.pendingRandomArticleId.collect { id ->
+            if (id != null) {
+                onOpenArticle(id)
+                app.pendingRandomArticleId.value = null
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        app.pendingFetchFeeds.collect { if (it) { vm.fetchAllFeedsViaWorker(); app.pendingFetchFeeds.value = false } }
+    }
+
     // Snackbars (shared bus, supports Undo actions)
     LaunchedEffect(Unit) {
         SnackbarBus.events.collect { event ->

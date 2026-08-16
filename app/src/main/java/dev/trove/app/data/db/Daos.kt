@@ -65,6 +65,9 @@ interface ArticleDao {
     @Query("SELECT * FROM articles WHERE saved = 1")
     suspend fun getAllSaved(): List<ArticleEntity>
 
+    @Query("SELECT id FROM articles WHERE saved = 1 ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomSavedId(): Long?
+
     @Query("SELECT * FROM highlights WHERE articleId = :articleId ORDER BY createdAt")
     fun observeHighlights(articleId: Long): Flow<List<HighlightEntity>>
 

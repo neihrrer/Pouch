@@ -2,6 +2,9 @@ package dev.trove.app
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
+import dev.trove.app.data.FeedSyncWorker
+import kotlinx.coroutines.launch
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -54,14 +57,31 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        val url = when (intent?.action) {
-            Intent.ACTION_SEND -> extractUrl(intent.getStringExtra(Intent.EXTRA_TEXT))
-            Intent.ACTION_VIEW -> intent.dataString
-            else -> null
+        when (intent?.action) {
+            Intent.ACTION_SEND -> {
+                extractUrl(intent.getStringExtra(Intent.EXTRA_TEXT))?.let {
+                    app.pendingShareUrl.value = it
+                }
+            }
+            Intent.ACTION_VIEW -> intent.dataString?.let { app.pendingShareUrl.value = it }
+            ACTION_SAVE_LINK -> app.pendingAddLink.value = true
+            ACTION_OPEN_RANDOM -> lifecycleScope.launch {
+                app.pendingRandomArticleId.value = app.repository.getRandomArticleId()
+            }
+            ACTION_FETCH_FEEDS -> {
+                app.pendingFetchFeeds.value = true
+                val request = androidx.work.OneTimeWorkRequestBuilder<FeedSyncWorker>().build()
+                androidx.work.WorkManager.getInstance(this).enqueueUniqueWork(
+                    "pouch-feed-refresh", androidx.work.ExistingWorkPolicy.REPLACE, request,
+                )
+            }
         }
-        if (!url.isNullOrBlank()) {
-            app.pendingShareUrl.value = url
-        }
+    }
+
+    companion object {
+        const val ACTION_SAVE_LINK = "dev.trove.app.action.SAVE_LINK"
+        const val ACTION_OPEN_RANDOM = "dev.trove.app.action.OPEN_RANDOM"
+        const val ACTION_FETCH_FEEDS = "dev.trove.app.action.FETCH_FEEDS"
     }
 
     private fun extractUrl(text: String?): String? {

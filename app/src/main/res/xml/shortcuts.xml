@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="save_link"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_add"
+        android:shortcutShortLabel="@string/shortcut_save_link"
+        android:shortcutLongLabel="@string/shortcut_save_link_long">
+        <intent
+            android:action="dev.trove.app.action.SAVE_LINK"
+            android:targetPackage="dev.trove.app"
+            android:targetClass="dev.trove.app.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="random_article"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_shuffle"
+        android:shortcutShortLabel="@string/shortcut_random"
+        android:shortcutLongLabel="@string/shortcut_random_long">
+        <intent
+            android:action="dev.trove.app.action.OPEN_RANDOM"
+            android:targetPackage="dev.trove.app"
+            android:targetClass="dev.trove.app.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="fetch_feeds"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_refresh"
+        android:shortcutShortLabel="@string/shortcut_feeds"
+        android:shortcutLongLabel="@string/shortcut_feeds_long">
+        <intent
+            android:action="dev.trove.app.action.FETCH_FEEDS"
+            android:targetPackage="dev.trove.app"
+            android:targetClass="dev.trove.app.MainActivity" />
+    </shortcut>
+</shortcuts>

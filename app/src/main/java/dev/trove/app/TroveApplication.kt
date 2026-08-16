@@ -48,6 +48,11 @@ class TroveApplication : Application(), SingletonImageLoader.Factory {
     /** URL shared into the app (share sheet / deep link), consumed by Home. */
     val pendingShareUrl = MutableStateFlow<String?>(null)
 
+    /** App-shortcut events, consumed by Home. */
+    val pendingAddLink = MutableStateFlow(false)
+    val pendingRandomArticleId = MutableStateFlow<Long?>(null)
+    val pendingFetchFeeds = MutableStateFlow(false)
+
     override fun onCreate() {
         super.onCreate()
         // Housekeeping: expire offline downloads + schedule feed syncing

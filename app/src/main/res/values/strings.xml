@@ -2,4 +2,10 @@
 <resources>
     <string name="app_name">Pouch</string>
     <string name="tagline">Keep your reading in a pouch</string>
+    <string name="shortcut_save_link">Save link</string>
+    <string name="shortcut_save_link_long">Save a link</string>
+    <string name="shortcut_random">Random article</string>
+    <string name="shortcut_random_long">Open a random article</string>
+    <string name="shortcut_feeds">Fetch feeds</string>
+    <string name="shortcut_feeds_long">Refresh all feeds</string>
 </resources>
