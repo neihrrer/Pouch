@@ -16,3 +16,6 @@ local.properties
 # Agent instructions (local only)
 AGENTS.md
 keystore.properties
+*.jks
+*.keystore
+.keystore-password.tmp
