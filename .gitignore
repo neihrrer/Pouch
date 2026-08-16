@@ -15,3 +15,4 @@ local.properties
 
 # Agent instructions (local only)
 AGENTS.md
+keystore.properties
