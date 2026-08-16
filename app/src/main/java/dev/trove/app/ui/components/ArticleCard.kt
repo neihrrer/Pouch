@@ -126,6 +126,21 @@ fun ArticleCard(
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        val minutes = readingMinutes(article.article.contentText)
+                        if (minutes != null) {
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "·",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.outline,
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "$minutes min read",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                         if (article.article.isFavorite) {
                             Spacer(Modifier.width(8.dp))
                             Icon(
@@ -264,4 +279,11 @@ private fun ArticleThumb(article: ArticleWithTags) {
             }
         }
     }
+}
+
+
+/** Estimated reading minutes at ~200 wpm; null when no text is stored. */
+fun readingMinutes(contentText: String?): Int? {
+    if (contentText.isNullOrBlank()) return null
+    return (contentText.split(Regex("\\s+")).size / 200).coerceAtLeast(1)
 }
