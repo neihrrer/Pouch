@@ -158,43 +158,6 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
             Spacer(Modifier.height(8.dp))
         }
 
-        if (state.feeds.isNotEmpty()) {
-            ExpressiveCard(
-                onClick = vm::openAllFeeds,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 10.dp),
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(14.dp),
-                        color = MaterialTheme.colorScheme.tertiaryContainer,
-                    ) {
-                        Box(modifier = Modifier.padding(10.dp).size(24.dp), contentAlignment = Alignment.Center) {
-                            Icon(
-                                Icons.Rounded.LibraryBooks,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                            )
-                        }
-                    }
-                    Spacer(Modifier.width(14.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("All feeds", style = MaterialTheme.typography.titleMedium)
-                        Text(
-                            "Every item from every subscription",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
-
         if (state.feeds.isEmpty()) {
             EmptyState(
                 icon = Icons.Rounded.RssFeed,
@@ -210,6 +173,14 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
+                // "All feeds" behaves like any other feed — first in the list
+                item(key = "all-feeds") {
+                    AllFeedsCard(
+                        totalUnread = state.feeds.sumOf { it.unreadCount },
+                        onClick = vm::openAllFeeds,
+                        modifier = Modifier.animateItem(),
+                    )
+                }
                 items(state.feeds, key = { it.feed.id }) { feed ->
                     FeedCard(
                         feed = feed,
@@ -254,6 +225,59 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
             onCreate = { name, _, _ -> vm.addCategory(name) },
             onDismiss = vm::hideNewCategory,
         )
+    }
+}
+
+@Composable
+private fun AllFeedsCard(
+    totalUnread: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    ExpressiveCard(onClick = onClick, modifier = modifier) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+            ) {
+                Box(modifier = Modifier.padding(10.dp).size(24.dp)) {
+                    Icon(
+                        Icons.Rounded.LibraryBooks,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+            }
+            Spacer(Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text("All feeds", style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "Every item from every subscription",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            if (totalUnread > 0) {
+                Spacer(Modifier.width(8.dp))
+                Surface(
+                    shape = RoundedCornerShape(50),
+                    color = MaterialTheme.colorScheme.tertiary,
+                ) {
+                    Text(
+                        "$totalUnread",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onTertiary,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                    )
+                }
+            }
+            Icon(Icons.Rounded.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 

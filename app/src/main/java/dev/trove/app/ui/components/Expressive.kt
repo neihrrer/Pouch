@@ -243,25 +243,11 @@ fun EmptyState(
         modifier = modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // M3 Expressive "cookie" shape backdrop: an asymmetric squircle
-        val cookie = remember {
-            GenericShape { size, _ ->
-                val w = size.width
-                val h = size.height
-                moveTo(0f, h * 0.32f)
-                quadraticTo(0f, 0f, w * 0.28f, 0f)
-                quadraticTo(w * 0.55f, 0f, w * 0.68f, h * 0.08f)
-                quadraticTo(w * 0.9f, h * 0.2f, w, h * 0.45f)
-                quadraticTo(w, h, w * 0.72f, h)
-                quadraticTo(w * 0.42f, h, w * 0.28f, h * 0.92f)
-                quadraticTo(0f, h * 0.8f, 0f, h * 0.45f)
-                close()
-            }
-        }
+        // Real M3 Expressive "cookie" shape (MaterialShapes cookie4Sided)
         Box(
             modifier = Modifier
-                .size(84.dp)
-                .background(shape = cookie, color = MaterialTheme.colorScheme.secondaryContainer),
+                .size(88.dp)
+                .background(shape = dev.trove.app.ui.theme.Cookie4Shape, color = MaterialTheme.colorScheme.secondaryContainer),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
