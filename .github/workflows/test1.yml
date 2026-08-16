@@ -59,14 +59,3 @@ jobs:
         run: |
           APK=app/build/outputs/apk/release/app-release.apk
           echo "sha=$(sha256sum "$APK" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-
-      - name: Create release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${{ steps.ver.outputs.ref }}" app/build/outputs/apk/release/app-release.apk \
-            --title "Pouch ${{ steps.ver.outputs.tag }}" \
-            --notes "Download **Pouch ${{ steps.ver.outputs.tag }}** and install the APK directly on your device.
-
-SHA-256: \`${{ steps.sha.outputs.sha }}\`" \
-            --generate-notes
