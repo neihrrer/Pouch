@@ -31,12 +31,8 @@ jobs:
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 -d > keystore.jks
-            cat > keystore.properties <<EOF
-            storeFile=keystore.jks
-            storePassword=$KEYSTORE_PASSWORD
-            keyAlias=$KEY_ALIAS
-            keyPassword=$KEY_PASSWORD
-            EOF
+            printf 'storeFile=keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+              "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > keystore.properties
           fi
 
       - name: Build release APK
@@ -62,11 +58,8 @@ jobs:
 
       - name: Write release notes
         run: |
-          cat > release-notes.md <<EOF
-          Download **Pouch ${{ steps.ver.outputs.tag }}** and install the APK directly on your device.
-
-          SHA-256: ${{ steps.sha.outputs.sha }}
-          EOF
+          printf 'Download **Pouch %s** and install the APK directly on your device.\n\nSHA-256: %s\n' \
+            "${{ steps.ver.outputs.tag }}" "${{ steps.sha.outputs.sha }}" > release-notes.md
 
       - name: Create release
         env:
