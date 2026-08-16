@@ -1,6 +1,6 @@
 # Pouch
 
-A privacy-first read-later app for Android with a built-in RSS reader — Material Design 3 Expressive.
+A privacy-first read-later app for Android with a built-in RSS reader, using Material Design 3 Expressive. Alternative to Pocket (RIP).
 
 Save articles and read them in a clean reader mode, organize them with folders (nested) and colorful tags, subscribe to RSS/Atom feeds, and keep everything available offline.
 
@@ -17,14 +17,6 @@ Save articles and read them in a clean reader mode, organize them with folders (
 - **Backup** — export/import your entire library (articles, folders, tags, feeds) as JSON
 - **Share integration** — share any link to Pouch to save it; deep links supported
 
-## Tech
-
-- Kotlin + Jetpack Compose (Material 3, expressive shapes/motion/typography)
-- Room (SQLite, FTS5 search), DataStore (settings)
-- ROME (feed parsing), readability4j (article extraction), Jsoup, OkHttp, Coil
-- WorkManager (background sync)
-- Google Sans Flex (open-source, OFL) as the UI typeface; OpenDyslexic (OFL) as a reader option
-
 ## Building
 
 ```bash
@@ -33,10 +25,6 @@ Save articles and read them in a clean reader mode, organize them with folders (
 
 The APK lands in `app/build/outputs/apk/debug/app-debug.apk`.
 Requires Android SDK with platform 37 and JDK 17+.
-
-## Versioning
-
-Version names follow `yyyy.mm.build` (e.g. `2026.08.16`), computed at build time.
 
 ## License
 
