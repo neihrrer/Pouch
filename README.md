@@ -26,43 +26,6 @@ Save articles and read them in a clean reader mode, organize them with folders (
 The APK lands in `app/build/outputs/apk/debug/app-debug.apk`.
 Requires Android SDK with platform 37 and JDK 17+.
 
-## Versioning
-
-Version names follow `yyyy.mm.release` (e.g. `2026.08.1`), where the last
-segment counts releases in the current month (git commits since month start).
-
-## Releases
-
-The CI **Release** workflow (`v*` tags) builds a minified, installable APK and
-publishes it as a GitHub Release with checksums.
-
-```bash
-# one-liner: builds locally, tags v<yyyy.mm.release>, pushes
-./scripts/release.sh
-
-# or manually
-./gradlew :app:assembleRelease
-git tag v2026.08.1 && git push origin v2026.08.1
-```
-
-Without a keystore, release APKs are signed with the debug key - installable,
-but not suitable for Play Store distribution. For proper signing:
-
-```bash
-keytool -genkey -v -keystore pouch-release.keystore -alias pouch \
-    -keyalg RSA -keysize 2048 -validity 10000
-cat > keystore.properties <<EOF
-storeFile=pouch-release.keystore
-storePassword=...
-keyAlias=pouch
-keyPassword=...
-EOF
-```
-
-Keep `keystore.properties` (gitignored) out of the repo. For CI signing, add
-secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
-You can also trigger the workflow manually (Actions - Release - Run workflow).
-
 ## License
 
 GNU General Public License v3.0 — see [LICENSE](LICENSE).
