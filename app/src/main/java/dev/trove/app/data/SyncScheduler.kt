@@ -10,6 +10,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import dev.trove.app.TroveApplication
+import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.first
 
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.first
  * an optional one-time sync on app start, and one-time OPML imports.
  */
 object SyncScheduler {
+
+    private const val OPML_IMPORT_FILE = "opml-import.xml"
 
     fun schedule(context: Context, interval: FeedFetchInterval, syncOnStart: Boolean) {
         val workManager = WorkManager.getInstance(context)
@@ -46,9 +49,16 @@ object SyncScheduler {
     }
 
     fun importOpml(context: Context, opml: String) {
+        // WorkManager Data is hard-limited to 10 KB (Data$Companion throws
+        // IllegalStateException when serializing more) — an OPML file with
+        // many feeds easily exceeds that, and build() runs on the main thread
+        // in HomeViewModel. Stage the content in a temp file and pass only
+        // the path; the worker reads (and deletes) it.
+        val file = File(context.cacheDir, OPML_IMPORT_FILE)
+        file.writeText(opml)
         val request = OneTimeWorkRequestBuilder<FeedSyncWorker>()
             .setConstraints(constraints(context))
-            .setInputData(Data.Builder().putString(FeedSyncWorker.KEY_OPML, opml).build())
+            .setInputData(Data.Builder().putString(FeedSyncWorker.KEY_OPML_FILE, file.absolutePath).build())
             .build()
         WorkManager.getInstance(context).enqueueUniqueWork(
             FeedSyncWorker.OPML_WORK,

@@ -448,7 +448,7 @@ class HomeViewModel(
             if (retention != OfflineRetention.ALWAYS) {
                 val removed = repo.cleanupOfflineDownloads(retention)
                 if (removed > 0) {
-                    SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_offline_expired, "$removed")))
+                    SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_offline_expired, removed)))
                 }
             }
         }
@@ -592,7 +592,7 @@ class HomeViewModel(
                     SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_subscribed, "${feed.title}")))
                     viewModelScope.launch {
                         val n = feedRepo.fetchFeed(feed).getOrDefault(0)
-                        if (n > 0) SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_imported_articles, "$n")))
+                        if (n > 0) SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_imported_articles, n)))
                     }
                 },
                 onFailure = { SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_couldnt_add_feed, "${it.message?.take(60)}"))) },
@@ -677,7 +677,12 @@ class HomeViewModel(
 
     fun importOpml(content: String) {
         syncActive.value = true
-        SyncScheduler.importOpml(appContext, content)
+        val enqueued = runCatching { SyncScheduler.importOpml(appContext, content) }.isSuccess
+        if (!enqueued) {
+            syncActive.value = false
+            SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_import_failed)))
+            return
+        }
         observeWork(FeedSyncWorker.OPML_WORK)
     }
 
@@ -774,7 +779,7 @@ class HomeViewModel(
         viewModelScope.launch {
             settingsRepo.setFeedRetention(retention)
             val removed = repo.cleanupFeedItems(retention)
-            if (removed > 0) SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_feed_items_expired, "$removed")))
+            if (removed > 0) SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_feed_items_expired, removed)))
         }
     }
 

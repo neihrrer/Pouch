@@ -65,9 +65,16 @@ class ExtractorSmokeTest {
     @Test
     fun rssFallbackForJsShellPage() = runBlocking {
         val doc = fetcher.fetchXml("https://www.astralcodexten.com/feed")
-        val item = doc.selectFirst("item, entry")
-        assertTrue("Feed is empty", item != null)
-        val linkEl = item!!.selectFirst("link")
+        val items = doc.select("item, entry")
+        assertTrue("Feed is empty", items.isNotEmpty())
+        // Feeds rotate: the newest post may be a short announcement/thread.
+        // Use the longest post so the test isn't hostage to whatever is
+        // currently at the top of the feed.
+        val item = items.maxByOrNull {
+            (it.selectFirst("content\\:encoded, content")?.html()
+                ?: it.selectFirst("description")?.html() ?: "").length
+        }!!
+        val linkEl = item.selectFirst("link")
         val link = linkEl?.attr("href")?.takeIf { it.isNotBlank() }
             ?: linkEl?.text()
             ?: ""

@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import dev.trove.app.TroveApplication
+import java.io.File
 import kotlinx.coroutines.flow.first
 
 /**
@@ -23,8 +24,7 @@ class FeedSyncWorker(
         val settingsRepo = app.settingsRepository
 
         return try {
-            val opml = inputData.getString(KEY_OPML)
-            val imported = opml?.let { feedRepo.importOpml(it) } ?: 0
+            val imported = readOpmlFile()?.let { feedRepo.importOpml(it) } ?: 0
 
             val settings = settingsRepo.settings.first()
             val added = feedRepo.fetchAllFeeds()
@@ -36,8 +36,22 @@ class FeedSyncWorker(
         }
     }
 
+    /** Reads (and deletes) the staged OPML file, if any. */
+    private fun readOpmlFile(): String? {
+        val path = inputData.getString(KEY_OPML_FILE) ?: return null
+        val file = File(path)
+        if (!file.exists()) return null
+        return try {
+            val content = file.readText()
+            file.delete()
+            content
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     companion object {
-        const val KEY_OPML = "opml"
+        const val KEY_OPML_FILE = "opml_file"
         const val KEY_IMPORTED = "imported"
         const val KEY_ADDED = "added"
         const val KEY_EXPIRED = "expired"

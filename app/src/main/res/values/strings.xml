@@ -236,6 +236,7 @@
     <string name="snack_imported_articles">Imported %1$d articles</string>
     <string name="snack_imported_new">Imported %1$d new articles</string>
     <string name="snack_no_feeds_found">No feeds found in the file</string>
+    <string name="snack_import_failed">Couldn\'t import OPML</string>
     <string name="snack_feeds_up_to_date">All feeds up to date</string>
     <string name="snack_no_new_articles">No new articles in %1$s</string>
     <string name="snack_refreshing_feeds">Refreshing feeds…</string>

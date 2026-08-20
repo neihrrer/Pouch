@@ -226,7 +226,7 @@ class ReaderViewModel(
             if (retention != OfflineRetention.ALWAYS) {
                 val removed = repo.cleanupOfflineDownloads(retention)
                 if (removed > 0) {
-                    SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_offline_expired, "$removed")))
+                    SnackbarBus.post(SnackbarBus.Event(appContext.getString(R.string.snack_offline_expired, removed)))
                 }
             }
         }
