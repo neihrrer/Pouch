@@ -2,12 +2,12 @@
 
 A privacy-first read-later app for Android with a built-in RSS reader, using Material Design 3 Expressive. Alternative to Pocket (RIP).
 
-Save articles and read them in a clean reader mode, organize them with folders (nested) and colorful tags, subscribe to RSS/Atom feeds, and keep everything available offline.
+Save articles and read them in a clean reader mode, organize them with folders and colorful tags, subscribe to RSS/Atom feeds, and keep everything available offline.
 
 ## Features
 
 - **Reader mode** — readability-based article extraction (readability4j, a Mozilla Readability port), with fallback scoring heuristics and RSS-feed content fallback for JS-only pages
-- **Library** — saved articles with folders (including nested folders), tags, favorites, unread/done filters, full-text search (FTS5), swipe actions (favorite / delete with undo)
+- **Library** — saved articles with folders, tags, favorites, unread/done filters, full-text search (FTS5), swipe actions (favorite / delete with undo)
 - **Highlights** — long-press a paragraph to highlight it in one of four theme-contrast colors
 - **Offline** — articles and their images can be downloaded for reading without a connection
 - **RSS reader** — subscribe by feed URL or website URL (feed auto-discovery), categories, per-feed unread counts, combined "All feeds" view, OPML import/export

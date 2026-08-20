@@ -377,14 +377,24 @@ class HomeViewModel(
     }
 
     fun moveToFolder(articleId: Long, folderId: Long?) {
+        // Optimistic update so the folder chip highlights immediately in the sheet.
+        actionsArticle.value?.takeIf { it.article.id == articleId }?.let { current ->
+            actionsArticle.value = current.copy(article = current.article.copy(folderId = folderId))
+        }
         viewModelScope.launch {
+            repo.ensureSaved(articleId)
             repo.setFolder(articleId, folderId)
         }
     }
 
     fun applyTags(articleId: Long, tagIds: Set<Long>) {
         viewModelScope.launch {
+            repo.ensureSaved(articleId)
             repo.setArticleTags(articleId, tagIds)
+            val newTags = if (tagIds.isEmpty()) emptyList() else repo.getTags().filter { it.id in tagIds }
+            actionsArticle.value?.takeIf { it.article.id == articleId }?.let { current ->
+                actionsArticle.value = current.copy(tags = newTags)
+            }
         }
     }
 
@@ -462,10 +472,10 @@ class HomeViewModel(
 
     // ---------------------------------------------------------------- library
 
-    fun createFolder(name: String, colorIndex: Int, parentId: Long? = null) {
+    fun createFolder(name: String, colorIndex: Int) {
         viewModelScope.launch {
             if (name.isBlank()) return@launch
-            repo.createFolder(name.trim(), colorIndex, parentId)
+            repo.createFolder(name.trim(), colorIndex)
             newFolderVisible.value = false
             editingFolder.value = null
         }
@@ -479,10 +489,10 @@ class HomeViewModel(
         editingFolder.value = null
     }
 
-    fun updateFolder(folder: FolderWithCount, name: String, colorIndex: Int, parentId: Long?) {
+    fun updateFolder(folder: FolderWithCount, name: String, colorIndex: Int) {
         viewModelScope.launch {
             if (name.isBlank()) return@launch
-            repo.updateFolder(folder.folder, name.trim(), colorIndex, parentId)
+            repo.updateFolder(folder.folder, name.trim(), colorIndex)
             editingFolder.value = null
         }
     }

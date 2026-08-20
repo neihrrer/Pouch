@@ -237,6 +237,10 @@ fun ArticleActionsSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         val a = article.article
+        var selectedFolderId by remember { mutableStateOf(a.folderId) }
+        var selectedTagIds by remember { mutableStateOf(article.tags.map { it.id }.toSet()) }
+        androidx.compose.runtime.LaunchedEffect(a.folderId) { if (selectedFolderId != a.folderId) selectedFolderId = a.folderId }
+        androidx.compose.runtime.LaunchedEffect(article.tags) { val external = article.tags.map { it.id }.toSet(); if (selectedTagIds != external) selectedTagIds = external }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -267,16 +271,16 @@ fun ArticleActionsSheet(
                 AccentChip(
                     text = stringResource(R.string.sheet_no_folder),
                     colorIndex = 0,
-                    selected = a.folderId == null,
-                    onClick = { onMoveToFolder(null) },
+                    selected = selectedFolderId == null,
+                    onClick = { selectedFolderId = null; onMoveToFolder(null) },
                     icon = Icons.Rounded.FolderOpen,
                 )
                 folders.forEach { f ->
                     AccentChip(
                         text = f.name,
                         colorIndex = f.colorIndex,
-                        selected = a.folderId == f.id,
-                        onClick = { onMoveToFolder(f.id) },
+                        selected = selectedFolderId == f.id,
+                        onClick = { selectedFolderId = f.id; onMoveToFolder(f.id) },
                         icon = Icons.Rounded.Folder,
                     )
                 }
@@ -296,13 +300,15 @@ fun ArticleActionsSheet(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                val selectedIds = article.tags.map { it.id }.toSet()
                 tags.forEach { t ->
                     AccentChip(
                         text = t.name,
                         colorIndex = t.colorIndex,
-                        selected = t.id in selectedIds,
-                        onClick = { onToggleTag(t.id) },
+                        selected = t.id in selectedTagIds,
+                        onClick = {
+                            selectedTagIds = if (t.id in selectedTagIds) selectedTagIds - t.id else selectedTagIds + t.id
+                            onToggleTag(t.id)
+                        },
                     )
                 }
                 AccentChip(
@@ -400,20 +406,16 @@ private fun ActionRow(
 @Composable
 fun NewEntitySheet(
     title: String,
-    onCreate: (String, Int, Long?) -> Unit,
+    onCreate: (String, Int) -> Unit,
     onDismiss: () -> Unit,
     initialName: String = "",
     initialColorIndex: Int = 0,
     isEdit: Boolean = false,
     onDelete: (() -> Unit)? = null,
     showColorPicker: Boolean = true,
-    folders: List<FolderEntity> = emptyList(),
-    initialParentId: Long? = null,
-    showParentPicker: Boolean = false,
 ) {
     var name by rememberSaveable { mutableStateOf(initialName) }
     var colorIndex by rememberSaveable { mutableStateOf(initialColorIndex) }
-    var parentId by rememberSaveable { mutableStateOf(initialParentId) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
@@ -434,31 +436,6 @@ fun NewEntitySheet(
                 shape = RoundedCornerShape(50),
                 singleLine = true,
             )
-
-            if (showParentPicker && folders.isNotEmpty()) {
-                Spacer(Modifier.height(16.dp))
-                Text(stringResource(R.string.common_inside), style = MaterialTheme.typography.labelLarge)
-                Spacer(Modifier.height(8.dp))
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    AccentChip(
-                        text = stringResource(R.string.common_top_level),
-                        colorIndex = 0,
-                        selected = parentId == null,
-                        onClick = { parentId = null },
-                    )
-                    folders.forEach { f ->
-                        AccentChip(
-                            text = f.name,
-                            colorIndex = f.colorIndex,
-                            selected = parentId == f.id,
-                            onClick = { parentId = f.id },
-                        )
-                    }
-                }
-            }
 
             if (showColorPicker) {
                 Spacer(Modifier.height(16.dp))
@@ -493,7 +470,7 @@ fun NewEntitySheet(
 
             Spacer(Modifier.height(20.dp))
             ExpressiveButton(
-                onClick = { if (name.isNotBlank()) onCreate(name.trim(), colorIndex, parentId) },
+                onClick = { if (name.isNotBlank()) onCreate(name.trim(), colorIndex) },
                 text = if (isEdit) stringResource(R.string.common_save_changes) else stringResource(R.string.common_create),
                 icon = if (isEdit) Icons.Rounded.Done else Icons.Rounded.Add,
                 modifier = Modifier.fillMaxWidth(),

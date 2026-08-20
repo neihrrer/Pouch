@@ -18,7 +18,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         FeedCategoryEntity::class,
         HighlightEntity::class,
     ],
-    version = 7,
+    version = 8,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -46,7 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         /**
-         * v4: nested folders (`folders.parentId`) and the RSS reader
+         * v4: folders parent support (later removed in v8) and the RSS reader
          * (feeds, feed_categories tables + article feed linkage).
          */
         private val MIGRATION_3_4 = object : Migration(3, 4) {
@@ -108,9 +108,28 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** v8: remove nested folders — drop `folders.parentId` (flat folders only). */
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Recreate folders without parentId; old column is discarded.
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS folders_new (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "name TEXT NOT NULL, colorIndex INTEGER NOT NULL DEFAULT 0, " +
+                        "position INTEGER NOT NULL DEFAULT 0, createdAt INTEGER NOT NULL)"
+                )
+                db.execSQL(
+                    "INSERT INTO folders_new (id, name, colorIndex, position, createdAt) " +
+                        "SELECT id, name, colorIndex, position, createdAt FROM folders"
+                )
+                db.execSQL("DROP TABLE folders")
+                db.execSQL("ALTER TABLE folders_new RENAME TO folders")
+            }
+        }
+
         fun build(context: Context): AppDatabase =
             Room.databaseBuilder(context, AppDatabase::class.java, "trove.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .fallbackToDestructiveMigration()
                 .build()
     }

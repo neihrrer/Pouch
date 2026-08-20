@@ -156,8 +156,7 @@ interface FolderDao {
 
     @Query(
         """
-        SELECT f.*, (SELECT COUNT(*) FROM articles a WHERE a.folderId = f.id) AS articleCount,
-        (SELECT name FROM folders p WHERE p.id = f.parentId) AS parentName
+        SELECT f.*, (SELECT COUNT(*) FROM articles a WHERE a.folderId = f.id) AS articleCount
         FROM folders f ORDER BY f.position, f.createdAt
         """
     )
@@ -174,9 +173,6 @@ interface FolderDao {
 
     @Query("SELECT MAX(position) FROM folders")
     suspend fun maxPosition(): Int?
-
-    @Query("UPDATE folders SET parentId = NULL WHERE parentId = :folderId")
-    suspend fun clearParent(folderId: Long)
 }
 
 @Dao

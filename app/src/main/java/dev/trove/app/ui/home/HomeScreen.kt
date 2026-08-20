@@ -261,7 +261,6 @@ fun HomeScreen(
                 )
                 state.browsingFolderId != null -> {
                     val folder = state.folders.firstOrNull { it.folder.id == state.browsingFolderId }
-                    val subfolders = state.folders.filter { it.folder.parentId == state.browsingFolderId }
                     BrowseList(
                         title = folder?.folder?.name ?: stringResource(R.string.tab_folders),
                         subtitle = stringResource(R.string.lib_count_saved, state.articles.size),
@@ -271,8 +270,6 @@ fun HomeScreen(
                         onDelete = { vm.deleteArticle(it) },
                         onToggleFavorite = { vm.toggleFavorite(it) },
                         onActions = vm::openActions,
-                        subfolders = subfolders,
-                        onOpenSubfolder = vm::openFolder,
                         onEdit = folder?.let { { vm.showEditFolder(it) } },
                     )
                 }
@@ -341,20 +338,18 @@ fun HomeScreen(
     if (state.newFolderVisible) {
         NewEntitySheet(
             title = stringResource(R.string.folders_new),
-            onCreate = { name, color, parentId ->
+            onCreate = { name, color ->
                 val article = state.actionsArticle
                 if (article != null) vm.createFolderAndApply(article.article.id, name, color)
-                else vm.createFolder(name, color, parentId)
+                else vm.createFolder(name, color)
             },
             onDismiss = vm::hideNewFolder,
-            folders = state.folders.map { it.folder },
-            showParentPicker = true,
         )
     }
     if (state.newTagVisible) {
         NewEntitySheet(
             title = stringResource(R.string.tags_new),
-            onCreate = { name, color, _ ->
+            onCreate = { name, color ->
                 val article = state.actionsArticle
                 if (article != null) vm.createTagAndApply(article.article.id, name, color)
                 else vm.createTag(name, color)
@@ -367,15 +362,12 @@ fun HomeScreen(
             title = stringResource(R.string.folders_edit),
             initialName = folder.folder.name,
             initialColorIndex = folder.folder.colorIndex,
-            initialParentId = folder.folder.parentId,
             isEdit = true,
             onDelete = { vm.deleteFolderWithMessage(folder) },
-            onCreate = { name, color, parentId ->
-                vm.updateFolder(folder, name, color, parentId)
+            onCreate = { name, color ->
+                vm.updateFolder(folder, name, color)
             },
             onDismiss = vm::hideEditFolder,
-            folders = state.folders.map { it.folder }.filter { it.id != folder.folder.id },
-            showParentPicker = true,
         )
     }
     state.editingTag?.let { tag ->
@@ -385,7 +377,7 @@ fun HomeScreen(
             initialColorIndex = tag.tag.colorIndex,
             isEdit = true,
             onDelete = { vm.deleteTagWithMessage(tag) },
-            onCreate = { name, color, _ -> vm.updateTag(tag, name, color) },
+            onCreate = { name, color -> vm.updateTag(tag, name, color) },
             onDismiss = vm::hideEditTag,
         )
     }
@@ -632,8 +624,6 @@ private fun BrowseList(
     onDelete: (ArticleWithTags) -> Unit,
     onToggleFavorite: (ArticleWithTags) -> Unit,
     onActions: (ArticleWithTags) -> Unit,
-    subfolders: List<dev.trove.app.data.db.FolderWithCount> = emptyList(),
-    onOpenSubfolder: ((Long) -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -657,23 +647,6 @@ private fun BrowseList(
                     Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.common_edit))
                 }
             }
-        }
-        if (subfolders.isNotEmpty() && onOpenSubfolder != null) {
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(subfolders, key = { it.folder.id }) { sub ->
-                    AccentChip(
-                        text = sub.folder.name,
-                        colorIndex = sub.folder.colorIndex,
-                        selected = false,
-                        onClick = { onOpenSubfolder(sub.folder.id) },
-                        icon = Icons.Rounded.Folder,
-                    )
-                }
-            }
-            Spacer(Modifier.height(4.dp))
         }
         if (articles.isEmpty()) {
             EmptyState(

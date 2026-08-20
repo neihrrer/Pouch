@@ -459,14 +459,14 @@ fun ReaderScreen(
     if (state.newFolderVisible && article != null) {
         NewEntitySheet(
             title = stringResource(R.string.folders_new),
-            onCreate = { name, color, _ -> vm.createFolderAndApply(article.article.id, name, color) },
+            onCreate = { name, color -> vm.createFolderAndApply(article.article.id, name, color) },
             onDismiss = vm::hideNewFolder,
         )
     }
     if (state.newTagVisible && article != null) {
         NewEntitySheet(
             title = stringResource(R.string.tags_new),
-            onCreate = { name, color, _ -> vm.createTagAndApply(article.article.id, name, color) },
+            onCreate = { name, color -> vm.createTagAndApply(article.article.id, name, color) },
             onDismiss = vm::hideNewTag,
         )
     }

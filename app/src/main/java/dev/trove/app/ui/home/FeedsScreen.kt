@@ -228,7 +228,7 @@ fun FeedsTab(state: HomeUiState, vm: HomeViewModel, onOpenArticle: (Long) -> Uni
         NewEntitySheet(
             title = stringResource(R.string.common_new_category),
             showColorPicker = false,
-            onCreate = { name, _, _ -> vm.addCategory(name) },
+            onCreate = { name, _ -> vm.addCategory(name) },
             onDismiss = vm::hideNewCategory,
         )
     }
@@ -454,7 +454,7 @@ private fun FeedEditSheet(
         NewEntitySheet(
             title = stringResource(R.string.common_new_category),
             showColorPicker = false,
-            onCreate = { name, _, _ ->
+            onCreate = { name, _ ->
                 onCreateCategory(name)
                 showNewCategory = false
             },

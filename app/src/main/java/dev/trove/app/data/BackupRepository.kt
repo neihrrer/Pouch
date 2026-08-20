@@ -33,10 +33,7 @@ class BackupRepository(private val context: android.content.Context, private val
 
         val root = JSONObject().put("app", "pouch").put("version", 1)
         root.put("folders", JSONArray().also { arr ->
-            folders.forEach { it -> arr.put(JSONObject()
-                .put("name", it.name).put("color", it.colorIndex)
-                .put("parent", it.parentId?.let { pid -> folders.firstOrNull { x -> x.id == pid }?.name } ?: JSONObject.NULL))
-            }
+            folders.forEach { it -> arr.put(JSONObject().put("name", it.name).put("color", it.colorIndex)) }
         })
         root.put("tags", JSONArray().also { arr ->
             tags.forEach { it -> arr.put(JSONObject().put("name", it.name).put("color", it.colorIndex)) }
@@ -90,14 +87,6 @@ class BackupRepository(private val context: android.content.Context, private val
                 val o = arr.getJSONObject(i)
                 val id = f.insert(FolderEntity(name = o.getString("name"), colorIndex = o.optInt("color")))
                 folderIds[o.getString("name")] = id
-            }
-            for (i in 0 until arr.length()) {
-                val o = arr.getJSONObject(i)
-                if (!o.isNull("parent")) {
-                    val child = f.getAll().firstOrNull { it.name == o.getString("name") } ?: continue
-                    val parentId = folderIds[o.getString("parent")] ?: continue
-                    f.update(child.copy(parentId = parentId))
-                }
             }
         }
         val tagIds = mutableMapOf<String, Long>()

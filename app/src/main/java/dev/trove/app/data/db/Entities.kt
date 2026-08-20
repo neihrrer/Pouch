@@ -15,8 +15,6 @@ data class FolderEntity(
     val name: String,
     val colorIndex: Int = 0,
     val position: Int = 0,
-    /** Nested folders: parent folder id, null = top level. */
-    val parentId: Long? = null,
     val createdAt: Long = System.currentTimeMillis(),
 )
 
@@ -112,7 +110,6 @@ data class ArticleWithTags(
 data class FolderWithCount(
     @Embedded val folder: FolderEntity,
     val articleCount: Int,
-    val parentName: String? = null,
 )
 
 data class TagWithCount(

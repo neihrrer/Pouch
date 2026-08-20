@@ -372,20 +372,18 @@ class ArticleRepository(
 
     // ---------------------------------------------------------- folder ops
 
-    suspend fun createFolder(name: String, colorIndex: Int, parentId: Long? = null): Long {
+    suspend fun createFolder(name: String, colorIndex: Int): Long {
         val pos = (folders.maxPosition() ?: -1) + 1
-        return folders.insert(FolderEntity(name = name, colorIndex = colorIndex, position = pos, parentId = parentId))
+        return folders.insert(FolderEntity(name = name, colorIndex = colorIndex, position = pos))
     }
 
-    suspend fun updateFolder(folder: FolderEntity, name: String, colorIndex: Int, parentId: Long?) {
-        folders.update(folder.copy(name = name, colorIndex = colorIndex, parentId = parentId))
+    suspend fun updateFolder(folder: FolderEntity, name: String, colorIndex: Int) {
+        folders.update(folder.copy(name = name, colorIndex = colorIndex))
     }
 
     suspend fun deleteFolder(folder: FolderEntity) {
         folders.delete(folder)
-        // Unfile the articles that lived in it; subfolders move to top level
         articles.getByFolder(folder.id).forEach { articles.setFolder(it.id, null) }
-        folders.clearParent(folder.id)
     }
 
     // ------------------------------------------------------------ tag ops
